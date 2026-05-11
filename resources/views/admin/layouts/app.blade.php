@@ -43,6 +43,11 @@
                 <i class="fa-solid fa-map-location-dot"></i>
                 {{ __('admin.nav_destinations') }}
             </a>
+            <a href="{{ route('admin.countries.index') }}"
+               class="admin-nav-link {{ request()->routeIs('admin.countries.*') ? 'active' : '' }}">
+                <i class="fa-solid fa-flag"></i>
+                {{ __('admin.nav_countries') }}
+            </a>
             <a href="{{ route('admin.testimonials.index') }}"
                class="admin-nav-link {{ request()->routeIs('admin.testimonials.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-star"></i>
@@ -59,13 +64,6 @@
                class="admin-nav-link {{ request()->routeIs('admin.surveys.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-clipboard-list"></i>
                 {{ __('admin.nav_surveys') }}
-            </a>
-
-            <div class="admin-nav-section">{{ __('admin.nav_users_section') }}</div>
-            <a href="{{ route('admin.users.index') }}"
-               class="admin-nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-users"></i>
-                {{ __('admin.nav_users') }}
             </a>
             <a href="{{ route('admin.subscribers.index') }}"
                class="admin-nav-link {{ request()->routeIs('admin.subscribers.*') ? 'active' : '' }}">
@@ -112,7 +110,7 @@
             <div class="admin-topbar-user">
                 {{-- Language switcher --}}
                 @php $currentLang = app()->getLocale(); @endphp
-                <form method="POST" action="{{ route('lang.switch', $currentLang === 'ar' ? 'en' : 'ar') }}" style="margin:0;">
+                <form method="POST" action="{{ route('admin.lang.switch', $currentLang === 'ar' ? 'en' : 'ar') }}" style="margin:0;">
                     @csrf
                     <button type="submit"
                             style="background:rgba(197,160,40,0.12); border:1px solid rgba(197,160,40,0.35); color:#C5A028; font-family:Cairo,sans-serif; font-size:0.78rem; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:0.35rem; padding:0.3rem 0.75rem; border-radius:20px; transition:all 0.2s;"
@@ -122,6 +120,44 @@
                         {{ $currentLang === 'ar' ? 'English' : 'عربي' }}
                     </button>
                 </form>
+                <span style="color:#E2E8F0;">|</span>
+
+                {{-- Currency widget --}}
+                <div style="position:relative;" id="adminCurrencyWidget">
+                    <button onclick="adminToggleCurrencyMenu()" id="adminCurrencyBtn"
+                            style="background:rgba(197,160,40,0.12); border:1px solid rgba(197,160,40,0.35); color:#C5A028; font-family:Cairo,sans-serif; font-size:0.78rem; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:0.35rem; padding:0.3rem 0.75rem; border-radius:20px; transition:all 0.2s;"
+                            onmouseover="this.style.background='rgba(197,160,40,0.22)'"
+                            onmouseout="this.style.background='rgba(197,160,40,0.12)'">
+                        <i class="fa-solid fa-coins fa-xs"></i>
+                        <span id="adminCurrencyBtnLabel">USD</span>
+                        <i class="fa-solid fa-chevron-down fa-xs" style="opacity:0.6; font-size:0.6rem;"></i>
+                    </button>
+                    <div id="adminCurrencyMenu" style="display:none; position:absolute; top:calc(100% + 8px); inset-inline-end:0; background:#0D2035; border:1px solid rgba(197,160,40,0.25); border-radius:12px; padding:0.5rem; min-width:170px; z-index:9999; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+                        @php
+                        $adminCurrencies = [
+                            'USD'=>['🇺🇸','USD','$'],
+                            'EUR'=>['🇪🇺','EUR','€'],
+                            'GBP'=>['🇬🇧','GBP','£'],
+                            'EGP'=>['🇪🇬','EGP','E£'],
+                            'SAR'=>['🇸🇦','SAR','ر.س'],
+                            'AED'=>['🇦🇪','AED','د.إ'],
+                            'KWD'=>['🇰🇼','KWD','د.ك'],
+                            'QAR'=>['🇶🇦','QAR','ر.ق'],
+                        ];
+                        @endphp
+                        @foreach($adminCurrencies as $code => [$flag, $label, $sym])
+                        <button onclick="adminSelectCurrency('{{ $code }}','{{ $sym }}')"
+                                data-admin-currency="{{ $code }}"
+                                style="display:flex; align-items:center; gap:0.5rem; width:100%; background:none; border:none; color:#C8D4E0; font-family:Cairo,sans-serif; font-size:0.82rem; padding:0.45rem 0.65rem; border-radius:8px; cursor:pointer; text-align:start; transition:background 0.15s;"
+                                onmouseover="this.style.background='rgba(197,160,40,0.12)';this.style.color='#F0D060'"
+                                onmouseout="this.style.background='none';this.style.color=this.dataset.adminCurrency===window.__adminActiveCurrency?'#F0D060':'#C8D4E0'">
+                            <span>{{ $flag }}</span>
+                            <span style="font-weight:700;">{{ $label }}</span>
+                            <span style="color:#64748B; font-size:0.75rem; margin-inline-start:auto;">{{ $sym }}</span>
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
                 <span style="color:#E2E8F0;">|</span>
                 <a href="{{ route('home') }}" target="_blank"
                    style="color:#64748B; font-size:0.8rem; text-decoration:none; display:flex; align-items:center; gap:0.3rem;">
@@ -161,5 +197,70 @@
     </div>
 
     @stack('scripts')
+
+    <script>
+    // ── Admin Currency Converter ───────────────────────────────────
+    @php $adminRates = app(\App\Services\CurrencyService::class)->getRates(); @endphp
+    const ADMIN_RATES = {
+        USD: 1,
+        EUR: {{ $adminRates['EUR'] ?? 0.92 }},
+        GBP: {{ $adminRates['GBP'] ?? 0.79 }},
+        EGP: {{ $adminRates['EGP'] ?? 50 }},
+        SAR: {{ $adminRates['SAR'] ?? 3.75 }},
+        AED: {{ $adminRates['AED'] ?? 3.67 }},
+        KWD: {{ $adminRates['KWD'] ?? 0.307 }},
+        QAR: {{ $adminRates['QAR'] ?? 3.64 }},
+    };
+    const ADMIN_SYMBOLS = { USD:'$', EUR:'€', GBP:'£', EGP:'E£', SAR:'SAR ', AED:'AED ', KWD:'KWD ', QAR:'QAR ' };
+
+    window.__adminActiveCurrency = localStorage.getItem('admin_currency') || 'USD';
+
+    function adminToggleCurrencyMenu() {
+        const menu = document.getElementById('adminCurrencyMenu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function adminSelectCurrency(code) {
+        window.__adminActiveCurrency = code;
+        localStorage.setItem('admin_currency', code);
+        document.getElementById('adminCurrencyBtnLabel').textContent = code;
+        document.getElementById('adminCurrencyMenu').style.display = 'none';
+        document.querySelectorAll('[data-admin-currency]').forEach(btn => {
+            btn.style.color = btn.dataset.adminCurrency === code ? '#F0D060' : '#C8D4E0';
+            btn.style.fontWeight = btn.dataset.adminCurrency === code ? '800' : 'normal';
+        });
+        adminConvertAllPrices();
+    }
+
+    function adminConvertAllPrices() {
+        const code   = window.__adminActiveCurrency;
+        const rate   = ADMIN_RATES[code] || 1;
+        const symbol = ADMIN_SYMBOLS[code] || code;
+        document.querySelectorAll('[data-price-usd]').forEach(el => {
+            const usd = parseFloat(el.dataset.priceUsd);
+            el.textContent = symbol + (usd * rate).toLocaleString(undefined, { maximumFractionDigits: 0 });
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        const widget = document.getElementById('adminCurrencyWidget');
+        if (widget && !widget.contains(e.target)) {
+            const menu = document.getElementById('adminCurrencyMenu');
+            if (menu) menu.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const saved = window.__adminActiveCurrency;
+        document.getElementById('adminCurrencyBtnLabel').textContent = saved;
+        document.querySelectorAll('[data-admin-currency]').forEach(btn => {
+            if (btn.dataset.adminCurrency === saved) {
+                btn.style.color = '#F0D060';
+                btn.style.fontWeight = '800';
+            }
+        });
+        adminConvertAllPrices();
+    });
+    </script>
 </body>
 </html>

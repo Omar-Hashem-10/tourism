@@ -1,6 +1,50 @@
 @extends('layouts.app')
 
-@section('title', 'تفاصيل الرحلة — رحلاتي')
+@php
+    use Illuminate\Support\Str;
+    $isAr      = app()->getLocale() === 'ar';
+    $lang      = $isAr ? 'ar' : 'en';
+    $tripTitle = $trip->getTranslation('title', $lang);
+    $tripDesc  = $trip->getTranslation('desc',  $lang);
+    $tripImage = $trip->getFirstMediaUrl('image') ?: asset('images/og-default.jpg');
+
+    $seoTitle    = $trip->getTranslation('meta_title',    $lang) ?: $tripTitle;
+    $seoDesc     = $trip->getTranslation('meta_desc',     $lang) ?: Str::limit(strip_tags($tripDesc), 155);
+    $seoKeywords = $trip->getTranslation('meta_keywords', $lang) ?: ($isAr
+        ? 'رحلة, ' . $tripTitle . ', رحلاتي, rahalaty, سياحة, حجز رحلات'
+        : 'trip, ' . $tripTitle . ', rahalaty, tourism egypt, book trip');
+@endphp
+
+@section('title', $seoTitle . ($isAr ? ' — رحلاتي' : ' — Rahalaty'))
+@section('meta_desc', $seoDesc)
+@section('meta_keywords', $seoKeywords)
+@section('og_type', 'product')
+@section('og_image', $tripImage)
+
+@section('seo_head')
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "TouristTrip",
+  "name": "{{ addslashes($tripTitle) }}",
+  "description": "{{ addslashes(Str::limit(strip_tags($tripDesc), 200)) }}",
+  "image": "{{ $tripImage }}",
+  "touristType": @json($trip->travel_type ?? []),
+  "offers": {
+    "@@type": "Offer",
+    "price": "{{ $trip->price }}",
+    "priceCurrency": "USD",
+    "availability": "{{ $trip->spots_left > 0 ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut' }}",
+    "url": "{{ route('trips.show', $trip->id) }}"
+  },
+  "provider": {
+    "@@type": "TravelAgency",
+    "name": "رحلاتي",
+    "url": "https://rahalaty.online"
+  }
+}
+</script>
+@endsection
 
 @push('styles')
 <style>
@@ -320,7 +364,7 @@
     $lang       = app()->getLocale();
     $isAr       = $lang === 'ar';
     $title      = $trip->getTranslation('title',      $lang);
-    $country    = $trip->getTranslation('country',    $lang);
+    $country    = $trip->destination?->getTranslation('name', $lang) ?? '';
     $desc       = $trip->getTranslation('desc',       $lang);
     $highlights = $trip->getTranslation('highlights', $lang) ?? [];
     $catLabels  = ['beach' => ($isAr ? 'شواطئ' : 'Beach'), 'culture' => ($isAr ? 'ثقافة وتاريخ' : 'Culture'), 'adventure' => ($isAr ? 'مغامرة' : 'Adventure')];
@@ -381,7 +425,6 @@
 
         {{-- Title --}}
         <h1 style="font-size:clamp(2rem,5vw,3.2rem); font-weight:900; color:white; line-height:1.2; margin-bottom:0.6rem; text-shadow:0 4px 20px rgba(0,0,0,0.4);">
-            <span style="font-size:0.85em;">{{ $trip->flag }} </span>
             {{ $title }}
         </h1>
 
@@ -487,28 +530,56 @@
         </div>
 
         {{-- What's included --}}
+        @php
+            $includedItems = $trip->getTranslation('included', $lang) ?? [];
+            $excludedItems = $trip->getTranslation('excluded', $lang) ?? [];
+            $hasProgram    = count($includedItems) || count($excludedItems);
+        @endphp
         <div style="margin-bottom:2.5rem;">
             <h2 class="det-section-title">
                 <i class="fa-solid fa-list-check" style="color:#C5A028;"></i>
-                <span data-i18n="tripDetailIncluded">ماذا يشمل البرنامج؟</span>
+                <span>{{ $isAr ? 'ماذا يشمل البرنامج؟' : "What's Included?" }}</span>
             </h2>
+            @if($hasProgram)
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 2rem;">
+                @if(count($includedItems))
+                <ul class="included-list">
+                    @foreach($includedItems as $item)
+                    <li><i class="fa-solid fa-check-circle"></i> <span>{{ $item }}</span></li>
+                    @endforeach
+                </ul>
+                @endif
+                @if(count($excludedItems))
+                <ul class="included-list">
+                    @foreach($excludedItems as $item)
+                    <li class="not-included"><i class="fa-solid fa-xmark-circle"></i> <span>{{ $item }}</span></li>
+                    @endforeach
+                </ul>
+                @endif
+            </div>
+            @else
+            {{-- Fallback hardcoded list when admin hasn't filled in data yet --}}
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 2rem;">
                 <ul class="included-list">
-                    <li><i class="fa-solid fa-check-circle"></i> <span data-i18n="incHotel">إقامة فندقية (فطور مشمول)</span></li>
-                    <li><i class="fa-solid fa-check-circle"></i> <span data-i18n="incFlights">تذاكر طيران ذهاب وإياب</span></li>
-                    <li><i class="fa-solid fa-check-circle"></i> <span data-i18n="incInsurance">تأمين سفر شامل</span></li>
-                    <li><i class="fa-solid fa-check-circle"></i> <span data-i18n="incGuide">مرشد سياحي معتمد</span></li>
+                    <li><i class="fa-solid fa-check-circle"></i> <span>{{ $isAr ? 'إقامة فندقية (فطور مشمول)' : 'Hotel accommodation (breakfast included)' }}</span></li>
+                    <li><i class="fa-solid fa-check-circle"></i> <span>{{ $isAr ? 'تذاكر طيران ذهاب وإياب' : 'Round-trip flight tickets' }}</span></li>
+                    <li><i class="fa-solid fa-check-circle"></i> <span>{{ $isAr ? 'تأمين سفر شامل' : 'Comprehensive travel insurance' }}</span></li>
+                    <li><i class="fa-solid fa-check-circle"></i> <span>{{ $isAr ? 'مرشد سياحي معتمد' : 'Certified tour guide' }}</span></li>
                 </ul>
                 <ul class="included-list">
-                    <li><i class="fa-solid fa-check-circle"></i> <span data-i18n="incTransfer">نقل من وإلى المطار</span></li>
-                    <li><i class="fa-solid fa-check-circle"></i> <span data-i18n="incTours">جولات يومية منظمة</span></li>
-                    <li class="not-included"><i class="fa-solid fa-xmark-circle"></i> <span data-i18n="excLunch">وجبات الغداء والعشاء</span></li>
-                    <li class="not-included"><i class="fa-solid fa-xmark-circle"></i> <span data-i18n="excPersonal">النفقات الشخصية</span></li>
+                    <li><i class="fa-solid fa-check-circle"></i> <span>{{ $isAr ? 'نقل من وإلى المطار' : 'Airport transfers' }}</span></li>
+                    <li><i class="fa-solid fa-check-circle"></i> <span>{{ $isAr ? 'جولات يومية منظمة' : 'Daily organized tours' }}</span></li>
+                    <li class="not-included"><i class="fa-solid fa-xmark-circle"></i> <span>{{ $isAr ? 'وجبات الغداء والعشاء' : 'Lunch & dinner meals' }}</span></li>
+                    <li class="not-included"><i class="fa-solid fa-xmark-circle"></i> <span>{{ $isAr ? 'النفقات الشخصية' : 'Personal expenses' }}</span></li>
                 </ul>
             </div>
+            @endif
         </div>
 
-        {{-- Programme timeline --}}
+        {{-- Daily Programme --}}
+        @php
+            $itineraryItems = $trip->getTranslation('itinerary', $lang) ?? [];
+        @endphp
         <div style="margin-bottom:2rem;">
             <h2 class="det-section-title">
                 <i class="fa-solid fa-calendar-days" style="color:#C5A028;"></i>
@@ -523,11 +594,11 @@
                     <div style="flex:1; padding-top:0.2rem;">
                         <div style="font-weight:700; font-size:0.95rem; color:#1A3A5C; margin-bottom:0.2rem;">
                             {{ $isAr ? "اليوم {$day}" : "Day {$day}" }}
-                            @if($day === 1){{ $isAr ? ' — الوصول والاستقبال' : ' — Arrival & Check-in' }}@endif
-                            @if($day === $trip->duration){{ $isAr ? ' — المغادرة' : ' — Departure' }}@endif
                         </div>
                         <div style="font-size:0.85rem; color:#777; line-height:1.6;">
-                            @if($day === 1)
+                            @if(!empty($itineraryItems[$day - 1]))
+                                {{ $itineraryItems[$day - 1] }}
+                            @elseif($day === 1)
                                 {{ $isAr ? 'الوصول إلى المطار، الاستقبال والانتقال إلى الفندق، جولة ترحيبية.' : 'Airport arrival, welcome reception, hotel check-in, orientation tour.' }}
                             @elseif($day === $trip->duration)
                                 {{ $isAr ? 'إفطار في الفندق، مغادرة وإجراءات المطار، وداع دافئ.' : 'Breakfast at hotel, check-out, airport procedures, farewell.' }}
@@ -548,7 +619,7 @@
     <div>
         <div class="booking-card">
             <div class="booking-card-header">
-                <div style="font-size:1.5rem; margin-bottom:0.5rem;">{{ $trip->flag }}</div>
+                @if($country)<div style="font-size:0.85rem; color:rgba(255,255,255,0.7); margin-bottom:0.5rem;"><i class="fa-solid fa-location-dot fa-xs"></i> {{ $country }}</div>@endif
                 <div class="booking-price" data-price-usd="{{ $trip->price }}">{{ $trip->currency }}{{ $trip->price }}</div>
                 <div class="booking-price-label">{{ $isAr ? 'للشخص الواحد' : 'Per Person' }}</div>
                 <div class="rating-row" style="justify-content:center; margin-top:0.6rem;">

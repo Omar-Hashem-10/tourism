@@ -2,32 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreBookingRequest;
 use App\Models\Booking;
 use App\Models\Trip;
-use Illuminate\Http\Request;
 
 class BookingController extends Controller
 {
     public function show(int $id)
     {
-        $trip = Trip::where('id', $id)->where('is_active', true)->firstOrFail();
+        $trip = Trip::active()->where('id', $id)->firstOrFail();
         return view('trips.booking', compact('trip'));
     }
 
-    public function store(Request $request, int $id)
+    public function store(StoreBookingRequest $request, int $id)
     {
-        $trip = Trip::where('id', $id)->where('is_active', true)->firstOrFail();
+        $trip = Trip::active()->where('id', $id)->firstOrFail();
 
-        $validated = $request->validate([
-            'name'           => 'required|string|max:100',
-            'email'          => 'required|email|max:150',
-            'phone'          => 'required|string|max:20',
-            'adults'         => 'required|integer|min:1|max:10',
-            'children'       => 'required|integer|min:0|max:10',
-            'travel_date'    => 'required|date',
-            'payment_method' => 'required|in:credit_card,visa,meeza,instapay,vodafone_cash',
-            'notes'          => 'nullable|string|max:500',
-        ]);
+        $validated = $request->validated();
 
         $ref = strtoupper('BK-' . date('Ymd') . '-' . substr(md5(uniqid()), 0, 6));
 
@@ -45,21 +36,19 @@ class BookingController extends Controller
             'payment_method' => $validated['payment_method'],
             'total_price'    => $totalPrice,
             'notes'          => $validated['notes'] ?? null,
-            'status'         => 'pending',
+            'status'         => 'confirmed',
         ]);
 
         if ($trip->spots_left > 0) {
             $trip->decrement('spots_left');
         }
 
-        session(['booking_ref' => $ref, 'booking_id' => $booking->id]);
-
-        return redirect()->route('trips.book.confirmed', $id);
+        return redirect()->route('payment.redirect', $booking);
     }
 
-    public function confirmed(Request $request, int $id)
+    public function confirmed(int $id)
     {
-        $trip    = Trip::where('id', $id)->firstOrFail();
+        $trip      = Trip::where('id', '=', $id)->firstOrFail();
         $bookingId = session('booking_id');
 
         if (!$bookingId) {

@@ -10,18 +10,29 @@ return new class extends Migration
     {
         Schema::create('destinations', function (Blueprint $table) {
             $table->id();
-            $table->json('name');         // {"ar":"...", "en":"..."}  — Spatie Translatable
-            $table->json('description'); // {"ar":"...", "en":"..."}
-            $table->string('image')->nullable();
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            $table->json('name');                   // {"ar":"...", "en":"..."}
+            $table->json('description');            // {"ar":"...", "en":"..."}
             $table->enum('category', ['beach', 'culture', 'adventure', 'heritage']);
             $table->boolean('is_featured')->default(false);
             $table->unsignedTinyInteger('sort_order')->default(0);
+            $table->json('meta_title')->nullable();
+            $table->json('meta_desc')->nullable();
+            $table->json('meta_keywords')->nullable();
             $table->timestamps();
+        });
+
+        Schema::table('trips', function (Blueprint $table) {
+            $table->foreign('destination_id')->references('id')->on('destinations')->nullOnDelete();
         });
     }
 
     public function down(): void
     {
+        Schema::table('trips', function (Blueprint $table) {
+            $table->dropForeign(['destination_id']);
+        });
+
         Schema::dropIfExists('destinations');
     }
 };

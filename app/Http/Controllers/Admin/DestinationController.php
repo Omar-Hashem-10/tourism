@@ -3,80 +3,76 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\DestinationRequest;
+use App\Models\Country;
 use App\Models\Destination;
-use Illuminate\Http\Request;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class DestinationController extends Controller
 {
     public function index()
     {
-        $destinations = Destination::orderBy('sort_order')->paginate(15);
+        $destinations = Destination::with('country')->orderBy('sort_order')->paginate(15);
         return view('admin.destinations.index', compact('destinations'));
     }
 
     public function create()
     {
-        return view('admin.destinations.create');
+        $countries = Country::orderBy('slug')->get();
+        return view('admin.destinations.create', compact('countries'));
     }
 
-    public function store(Request $request)
+    public function store(DestinationRequest $request)
     {
-        $validated = $request->validate([
-            'name.ar'        => 'required|string|max:150',
-            'name.en'        => 'required|string|max:150',
-            'description.ar' => 'required|string',
-            'description.en' => 'required|string',
-            'category'       => 'required|in:beach,culture,adventure,heritage',
-            'is_featured'    => 'boolean',
-            'sort_order'     => 'nullable|integer|min:0',
-            'image'          => 'nullable|image|max:2048',
-        ]);
-
-        $destination = Destination::create($validated);
+        $destination = Destination::create($request->validated());
 
         if ($request->hasFile('image')) {
-            $destination->addMediaFromRequest('image')
-                ->toMediaCollection('image');
+            $destination->addMediaFromRequest('image')->toMediaCollection('image');
+        }
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $file) {
+                $destination->addMedia($file)->toMediaCollection('gallery');
+            }
         }
 
         return redirect()->route('admin.destinations.index')
-            ->with('success', 'تم إضافة الوجهة بنجاح.');
+            ->with('success', __('admin.destination_created'));
     }
 
     public function edit(Destination $destination)
     {
-        return view('admin.destinations.edit', compact('destination'));
+        $countries = Country::orderBy('slug')->get();
+        return view('admin.destinations.edit', compact('destination', 'countries'));
     }
 
-    public function update(Request $request, Destination $destination)
+    public function update(DestinationRequest $request, Destination $destination)
     {
-        $validated = $request->validate([
-            'name.ar'        => 'required|string|max:150',
-            'name.en'        => 'required|string|max:150',
-            'description.ar' => 'required|string',
-            'description.en' => 'required|string',
-            'category'       => 'required|in:beach,culture,adventure,heritage',
-            'is_featured'    => 'boolean',
-            'sort_order'     => 'nullable|integer|min:0',
-            'image'          => 'nullable|image|max:2048',
-        ]);
-
-        $destination->update($validated);
+        $destination->update($request->validated());
 
         if ($request->hasFile('image')) {
             $destination->clearMediaCollection('image');
-            $destination->addMediaFromRequest('image')
-                ->toMediaCollection('image');
+            $destination->addMediaFromRequest('image')->toMediaCollection('image');
+        }
+
+        foreach ($request->input('gallery_delete', []) as $mediaId) {
+            Media::find($mediaId)?->delete();
+        }
+
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $file) {
+                $destination->addMedia($file)->toMediaCollection('gallery');
+            }
         }
 
         return redirect()->route('admin.destinations.index')
-            ->with('success', 'تم تحديث الوجهة بنجاح.');
+            ->with('success', __('admin.destination_updated'));
     }
 
     public function destroy(Destination $destination)
     {
         $destination->delete();
         return redirect()->route('admin.destinations.index')
-            ->with('success', 'تم حذف الوجهة.');
+            ->with('success', __('admin.destination_deleted'));
     }
 }

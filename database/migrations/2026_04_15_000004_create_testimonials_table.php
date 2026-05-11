@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::create('testimonials', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('booking_id')->nullable()->constrained('bookings')->nullOnDelete();
             $table->string('name', 100);
-            $table->string('avatar')->nullable();
-            $table->json('review');       // {"ar":"...", "en":"..."}  — Spatie Translatable
+            $table->text('review');
             $table->unsignedTinyInteger('rating')->default(5);  // 1–5
             $table->boolean('is_active')->default(true);
             $table->timestamps();

@@ -13,7 +13,7 @@ class SurveyController extends Controller
         $query = SurveyResponse::query();
 
         if ($request->filled('search')) {
-            $s = $request->search;
+            $s = $request->input('search');
             $query->where(function ($q) use ($s) {
                 $q->where('name', 'like', "%$s%")
                   ->orWhere('email', 'like', "%$s%");
@@ -21,11 +21,11 @@ class SurveyController extends Controller
         }
 
         if ($request->filled('travel_type')) {
-            $query->where('travel_type', $request->travel_type);
+            $query->where('travel_type', $request->input('travel_type'));
         }
 
         if ($request->filled('budget')) {
-            $query->where('budget', $request->budget);
+            $query->where('budget', $request->input('budget'));
         }
 
         $surveys = $query->latest()->paginate(20)->withQueryString();

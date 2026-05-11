@@ -1,6 +1,27 @@
 @extends('layouts.app')
 
-@section('title', app()->getLocale() == 'ar' ? 'رحلاتي — اكتشف العالم' : 'Rehlatyy — Discover the World')
+@section('title', app()->getLocale() == 'ar' ? 'رحلاتي — اكتشف العالم' : 'Rahalaty — Discover the World')
+
+@php $__homeDesc = app()->getLocale() == 'ar' ? 'رحلاتي | أفضل شركة سياحة مصرية — احجز رحلتك إلى الغردقة وشرم الشيخ والأقصر وأوروبا. أكثر من 16 وجهة سياحية بأسعار تنافسية وأجواء مصرية دافئة.' : 'Rahalaty | Best Egyptian Travel Agency — Book trips to Hurghada, Sharm El-Sheikh, Luxor, Europe & more. 16+ destinations at competitive prices with warm Egyptian hospitality.'; @endphp
+@section('meta_desc', $__homeDesc)
+
+@section('meta_keywords', 'رحلاتي, rahalaty, rahalaty.online, رحلات مصر, سياحة مصر, الغردقة, شرم الشيخ, الأقصر, أسوان, حجز رحلات, egypt travel, hurghada trips, sharm el sheikh, luxor aswan, cairo tours, سياحة داخلية, رحلات خارجية')
+
+@section('seo_head')
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@type": "WebSite",
+  "name": "رحلاتي | Rahalaty",
+  "url": "https://rahalaty.online",
+  "potentialAction": {
+    "@@type": "SearchAction",
+    "target": "https://rahalaty.online/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+@endsection
 
 @php $isAr = app()->getLocale() === 'ar'; @endphp
 
@@ -138,7 +159,7 @@
         @endphp
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem;">
 
-            @forelse($destinations->take(6) as $dest)
+            @forelse($egyptDestinations as $dest)
             @php
                 $destImg  = $dest->getFirstMedia('image');
                 $destName = $dest->getTranslation('name', $destLang);
@@ -146,7 +167,8 @@
                 $emoji    = $destCategoryEmoji[$dest->category] ?? '📍';
                 $delay    = $loop->index * 0.1;
             @endphp
-            <div class="egypt-dest-card fade-up" style="transition-delay:{{ $delay }}s;
+            <a href="{{ route('destinations.show', $dest->id) }}" style="display:block; text-decoration:none;">
+            <div class="egypt-dest-card fade-up" style="transition-delay:{{ $delay }}s; cursor:pointer;
                 @if($destImg)
                     background-image:url('{{ $destImg->getUrl() }}');
                 @else
@@ -154,15 +176,15 @@
                 @endif
                 background-size:cover; background-position:center;">
                 <div class="egypt-dest-content">
-                    <div style="font-size:2.5rem; margin-bottom:0.5rem;">{{ $emoji }}</div>
                     <h3 style="font-size:1.5rem; font-weight:800; margin-bottom:0.4rem;">{{ $destName }}</h3>
                     <p style="font-size:0.9rem; opacity:0.85; margin-bottom:1rem; line-height:1.6;">{{ Str::limit($destDesc, 90) }}</p>
                     <div style="display:flex; align-items:center; justify-content:space-between;">
                         <span style="background:rgba(255,255,255,0.2); padding:0.3rem 0.8rem; border-radius:20px; font-size:0.85rem; font-weight:700; text-transform:capitalize;">{{ $dest->category }}</span>
-                        <a href="{{ route('survey.index') }}" style="color:#F0D060; font-weight:700; font-size:0.9rem; text-decoration:none;">{{ $isAr ? 'احجز ←' : 'Book →' }}</a>
+                        <span style="color:#F0D060; font-weight:700; font-size:0.9rem;">{{ $isAr ? 'استكشف الرحلات ←' : 'View Trips →' }}</span>
                     </div>
                 </div>
             </div>
+            </a>
             @empty
             <div style="grid-column:1/-1; text-align:center; padding:3rem; color:#999;">
                 <div style="font-size:2rem; margin-bottom:0.5rem;">🗺</div>
@@ -198,6 +220,20 @@
                 <div style="font-size:2rem; margin-bottom:0.5rem;">⏳</div>
                 <div>{{ $isAr ? 'جاري تحميل الرحلات...' : 'Loading trips...' }}</div>
             </div>
+        </div>
+
+        {{-- Load More --}}
+        <div style="text-align:center; margin-top:2.5rem;" id="loadMoreWrap">
+            <button id="loadMoreBtn"
+                onclick="loadMoreTrips()"
+                style="display:none; margin:0 auto; padding:0.85rem 2.5rem;
+                       background:linear-gradient(135deg,#C5A028,#F0D060); color:#1A1A1A;
+                       font-weight:800; font-size:1rem; border:none; border-radius:12px;
+                       cursor:pointer; transition:all 0.2s; font-family:inherit;
+                       align-items:center; gap:0.6rem;">
+                <i class="fa-solid fa-chevron-down"></i>
+                <span id="loadMoreLabel">{{ $isAr ? 'عرض المزيد' : 'Show More' }}</span>
+            </button>
         </div>
     </div>
 </section>
@@ -374,27 +410,43 @@ let lang = document.documentElement.lang || 'ar';
     document.querySelectorAll('[data-counter]').forEach(el => observer.observe(el));
 })();
 
-// ── Merge admin-uploaded images into static trip data
-const dbTripImages = @json($tripImages);
-if (Object.keys(dbTripImages).length) {
-    window.TRIPS_DATA = window.TRIPS_DATA.map(t => ({
-        ...t,
-        image: dbTripImages[t.id] || null,
-    }));
-}
-// filterByCategory in trips.js closes over the original module const, not window.TRIPS_DATA.
-// Override it here so it always reads the (possibly image-enriched) window.TRIPS_DATA.
-window.filterByCategory = (cat) =>
-    cat === 'all'
-        ? window.TRIPS_DATA
-        : window.TRIPS_DATA.filter(t => t.category === cat);
+// window.TRIPS_DATA is already populated from the DB by the layout injection.
 
 // ── Render trips
-const tripsGrid = document.getElementById('tripsGrid');
+const tripsGrid    = document.getElementById('tripsGrid');
+const loadMoreBtn  = document.getElementById('loadMoreBtn');
+const loadMoreLabel = document.getElementById('loadMoreLabel');
+const INITIAL_COUNT = 8;
+const STEP_COUNT    = 4;
+
+let visibleCount    = INITIAL_COUNT;
+let activeCategory  = 'all';
+
+function renderVisible() {
+    const all     = window.filterByCategory(activeCategory);
+    const visible = all.slice(0, visibleCount);
+    window.renderTripCards(visible, lang, tripsGrid);
+
+    if (window.__convertAllPrices) window.__convertAllPrices();
+
+    const remaining = all.length - visibleCount;
+    if (remaining > 0) {
+        loadMoreLabel.textContent = lang === 'ar' ? 'عرض المزيد' : 'Show More';
+        loadMoreBtn.style.display = 'inline-flex';
+    } else {
+        loadMoreBtn.style.display = 'none';
+    }
+}
+
+window.loadMoreTrips = function() {
+    visibleCount += STEP_COUNT;
+    renderVisible();
+};
 
 function renderCurrentTrips(category = 'all') {
-    const trips = window.filterByCategory(category);
-    window.renderTripCards(trips, lang, tripsGrid);
+    activeCategory = category;
+    visibleCount   = INITIAL_COUNT;
+    renderVisible();
 }
 
 renderCurrentTrips('all');
@@ -410,10 +462,8 @@ document.querySelectorAll('.filter-tab').forEach(tab => {
 
 // ── Language change: re-render trips and update ticker
 document.addEventListener('langChanged', (e) => {
-    const newLang = e.detail.lang;
-    const activeTab = document.querySelector('.filter-tab.active');
-    const category = activeTab ? activeTab.dataset.category : 'all';
-    renderCurrentTrips(category);
+    lang = e.detail.lang;
+    renderVisible();
 
     // Update ticker texts
     document.querySelectorAll('.offer-text').forEach(el => {
@@ -432,8 +482,25 @@ window.subscribeNewsletter = function() {
         alert(lang === 'ar' ? 'يرجى إدخال بريد إلكتروني صحيح' : 'Please enter a valid email address');
         return;
     }
-    document.getElementById('newsletterForm').style.display = 'none';
-    document.getElementById('newsletterSuccess').style.display = 'block';
+
+    fetch('{{ route('newsletter.subscribe') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({ email }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('newsletterForm').style.display = 'none';
+            document.getElementById('newsletterSuccess').style.display = 'block';
+        }
+    })
+    .catch(() => {
+        alert(lang === 'ar' ? 'حدث خطأ، حاول مرة أخرى' : 'Something went wrong, please try again.');
+    });
 };
 
 }); // end DOMContentLoaded

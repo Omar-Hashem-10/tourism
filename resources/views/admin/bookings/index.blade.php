@@ -15,7 +15,6 @@
     <input type="text" name="search" class="admin-input" placeholder="🔍  {{ __('admin.search_bookings') }}" value="{{ request('search') }}" style="flex:1; min-width:200px;">
     <select name="status" class="admin-select" style="width:auto;">
         <option value="">{{ __('admin.all_statuses') }}</option>
-        <option value="pending"   {{ request('status')=='pending'   ?'selected':'' }}>{{ __('admin.status_pending') }}</option>
         <option value="confirmed" {{ request('status')=='confirmed' ?'selected':'' }}>{{ __('admin.status_confirmed') }}</option>
         <option value="cancelled" {{ request('status')=='cancelled' ?'selected':'' }}>{{ __('admin.status_cancelled') }}</option>
         <option value="completed" {{ request('status')=='completed' ?'selected':'' }}>{{ __('admin.status_completed') }}</option>
@@ -60,14 +59,14 @@
                     <td style="font-size:0.85rem;">{{ $b->trip ? $b->trip->getTranslation('title', app()->getLocale()) : '—' }}</td>
                     <td style="font-size:0.8rem; color:#64748B;">{{ $b->created_at->format('Y-m-d') }}</td>
                     <td style="font-size:0.8rem;">{{ $b->travel_date?->format('Y-m-d') }}</td>
-                    <td style="font-weight:700; color:#059669;">${{ number_format($b->total_price, 0) }}</td>
+                    <td style="font-weight:700; color:#059669;" data-price-usd="{{ $b->total_price }}">${{ number_format($b->total_price, 0) }}</td>
                     <td style="font-size:0.8rem;">{{ $b->payment_method_label }}</td>
                     <td>
                         <form method="POST" action="{{ route('admin.bookings.status', $b) }}" style="margin:0;">
                             @csrf @method('PATCH')
                             <select name="status" class="admin-select" style="width:auto; font-size:0.78rem; padding:0.25rem 0.5rem;"
                                     onchange="this.form.submit()">
-                                @foreach(['pending','confirmed','cancelled','completed'] as $val)
+                                @foreach(['confirmed','cancelled','completed'] as $val)
                                     <option value="{{ $val }}" {{ $b->status==$val?'selected':'' }}>{{ __('admin.status_'.$val) }}</option>
                                 @endforeach
                             </select>

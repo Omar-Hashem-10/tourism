@@ -99,16 +99,9 @@
     $lang  = app()->getLocale();
     $isAr  = $lang === 'ar';
     $tripTitle   = $trip->getTranslation('title',   $lang);
-    $tripCountry = $trip->getTranslation('country', $lang);
+    $tripCountry = $trip->destination?->getTranslation('name', $lang) ?? '';
     $durationLabel = $isAr ? "{$trip->duration} أيام" : "{$trip->duration} Days";
-    $pmLabels = [
-        'credit_card'   => ['label'=>'بطاقة ائتمان',  'icon'=>'fa-solid fa-credit-card',          'bg'=>'#EEF2FF','color'=>'#1A3A5C'],
-        'visa'          => ['label'=>'Visa',           'icon'=>'fa-brands fa-cc-visa',              'bg'=>'#EEF2FF','color'=>'#1A1F71'],
-        'meeza'         => ['label'=>'ميزة',            'icon'=>'fa-solid fa-id-card',               'bg'=>'#FFF0F0','color'=>'#CE1126'],
-        'instapay'      => ['label'=>'InstaPay',       'icon'=>'fa-solid fa-bolt',                  'bg'=>'#F5F0FF','color'=>'#7B2FBE'],
-        'vodafone_cash' => ['label'=>'فودافون كاش',    'icon'=>'fa-solid fa-mobile-screen-button',  'bg'=>'#FFF0F0','color'=>'#E60000'],
-    ];
-    $pm = $pmLabels[$booking->payment_method] ?? ['label'=>$booking->payment_method,'icon'=>'fa-solid fa-credit-card','bg'=>'#f0f0f0','color'=>'#333'];
+    $pm = ['label' => 'Paymob', 'icon' => 'fa-solid fa-shield-halved', 'bg' => '#EEF2FF', 'color' => '#1A3A5C'];
 @endphp
 
 @section('content')
@@ -131,7 +124,6 @@
 
         <div class="details-body">
             <div style="display:flex; align-items:center; gap:0.75rem; padding-bottom:1.25rem; margin-bottom:0.5rem; border-bottom:2px solid #f5f5f5;">
-                <div style="font-size:2rem;">{{ $trip->flag }}</div>
                 <div>
                     <div style="font-weight:800; font-size:1.1rem; color:#1A3A5C;">{{ $tripTitle }}</div>
                     <div style="font-size:0.85rem; color:#888;">{{ $tripCountry }} · {{ $durationLabel }}</div>
@@ -180,9 +172,9 @@
                 </span>
             </div>
             <div class="det-row">
-                <span class="det-label"><i class="fa-solid fa-dollar-sign"></i> {{ $isAr ? 'المبلغ الإجمالي' : 'Total Amount' }}</span>
-                <span class="det-value" style="color:#C5A028; font-size:1.1rem;">
-                    {{ $trip->currency }}{{ number_format($booking->total_price, 0) }}
+                <span class="det-label"><i class="fa-solid fa-money-bill-wave"></i> {{ $isAr ? 'المبلغ المدفوع' : 'Amount Paid' }}</span>
+                <span class="det-value" style="color:#1A936F; font-size:1.15rem; font-weight:900;">
+                    {{ number_format($booking->paid_amount_egp, 0) }} {{ $isAr ? 'ج.م' : 'EGP' }}
                 </span>
             </div>
             @if($booking->notes)

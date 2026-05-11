@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateBookingStatusRequest;
+use App\Mail\TripCompleted;
 use App\Models\Booking;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class BookingController extends Controller
 {
@@ -13,11 +16,11 @@ class BookingController extends Controller
         $query = Booking::with('trip');
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $query->where('status', $request->input('status'));
         }
 
         if ($request->filled('search')) {
-            $s = $request->search;
+            $s = $request->input('search');
             $query->where(function ($q) use ($s) {
                 $q->where('name', 'like', "%$s%")
                   ->orWhere('email', 'like', "%$s%")
@@ -26,11 +29,11 @@ class BookingController extends Controller
         }
 
         if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->date_from);
+            $query->whereDate('created_at', '>=', $request->input('date_from'));
         }
 
         if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->date_to);
+            $query->whereDate('created_at', '<=', $request->input('date_to'));
         }
 
         $bookings = $query->latest()->paginate(20)->withQueryString();
@@ -44,19 +47,22 @@ class BookingController extends Controller
         return view('admin.bookings.show', compact('booking'));
     }
 
-    public function updateStatus(Request $request, Booking $booking)
+    public function updateStatus(UpdateBookingStatusRequest $request, Booking $booking)
     {
-        $request->validate([
-            'status' => 'required|in:pending,confirmed,cancelled,completed',
-        ]);
+        $data = ['status' => $request->input('status')];
 
-        $data = ['status' => $request->status];
-
-        if ($request->status === 'confirmed' && !$booking->confirmed_at) {
+        if ($request->input('status') === 'confirmed' && !$booking->confirmed_at) {
             $data['confirmed_at'] = now();
         }
 
         $booking->update($data);
+
+        if ($request->input('status') === 'completed') {
+            $booking->load('trip');
+            Mail::to($booking->email)->queue(
+                new TripCompleted($booking, $booking->trip, 'en')
+            );
+        }
 
         return back()->with('success', 'تم تحديث حالة الحجز.');
     }

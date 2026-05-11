@@ -7,6 +7,57 @@
     <title>@yield('title', 'رحلاتي — اكتشف العالم')</title>
     <meta name="description" content="@yield('meta_desc', 'اكتشف أجمل الرحلات السياحية حول العالم مع أجواء مصرية أصيلة')">
 
+    {{-- Canonical & hreflang --}}
+    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="alternate" hreflang="ar" href="{{ url()->current() }}">
+    <link rel="alternate" hreflang="en" href="{{ url()->current() }}">
+    <link rel="alternate" hreflang="x-default" href="{{ url('/') }}">
+
+    {{-- Additional SEO --}}
+    <meta name="keywords" content="@yield('meta_keywords', 'رحلاتي, rahalaty, rahalaty.online, سياحة, رحلات, مصر, egypt travel, tourism, hurghada, sharm el sheikh')">
+    <meta name="robots" content="@yield('meta_robots', 'index, follow')">
+    <meta name="author" content="رحلاتي | Rahalaty">
+    <meta name="geo.region" content="EG">
+    <meta name="geo.placename" content="Cairo, Egypt">
+
+    {{-- Open Graph --}}
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:title" content="@yield('title', 'رحلاتي — اكتشف العالم')">
+    <meta property="og:description" content="@yield('meta_desc', 'اكتشف أجمل الرحلات السياحية حول العالم مع أجواء مصرية أصيلة')">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="رحلاتي | Rahalaty">
+    <meta property="og:locale" content="{{ app()->getLocale() == 'ar' ? 'ar_EG' : 'en_US' }}">
+    <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="@yield('title', 'رحلاتي — اكتشف العالم')">
+
+    {{-- Twitter Card --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@rahalaty">
+    <meta name="twitter:title" content="@yield('title', 'رحلاتي — اكتشف العالم')">
+    <meta name="twitter:description" content="@yield('meta_desc', 'اكتشف أجمل الرحلات السياحية حول العالم مع أجواء مصرية أصيلة')">
+    <meta name="twitter:image" content="@yield('og_image', asset('images/og-default.jpg'))">
+
+    {{-- Organization JSON-LD (present on all pages) --}}
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "TravelAgency",
+      "name": "رحلاتي",
+      "alternateName": "Rahalaty",
+      "url": "https://rahalaty.online",
+      "logo": "https://rahalaty.online/images/og-default.jpg",
+      "address": {"@@type": "PostalAddress", "addressLocality": "Cairo", "addressCountry": "EG"},
+      "telephone": "+201000000000",
+      "email": "info@rahalaty.online",
+      "sameAs": ["https://rahalaty.online"]
+    }
+    </script>
+
+    {{-- Page-specific JSON-LD & extra head --}}
+    @yield('seo_head')
+
     <!-- Google Fonts: Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,6 +65,41 @@
 
     <!-- Font Awesome 6 Free -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    @php
+        $__dbTrips = \App\Models\Trip::where('is_active', true)
+            ->with(['media', 'destination'])
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->map(fn($t) => [
+                'id'              => $t->id,
+                'title_ar'        => $t->getTranslation('title', 'ar'),
+                'title_en'        => $t->getTranslation('title', 'en'),
+                'country_ar'      => $t->destination?->getTranslation('name', 'ar') ?? '',
+                'country_en'      => $t->destination?->getTranslation('name', 'en') ?? '',
+                'desc_ar'         => $t->getTranslation('desc', 'ar'),
+                'desc_en'         => $t->getTranslation('desc', 'en'),
+                'highlights_ar'   => $t->getTranslation('highlights', 'ar') ?? [],
+                'highlights_en'   => $t->getTranslation('highlights', 'en') ?? [],
+                'price'           => (float) $t->price,
+                'currency'        => $t->currency,
+                'duration'        => $t->duration,
+                'category'        => $t->category,
+                'climate'         => $t->climate,
+                'travel_type'     => $t->travel_type ?? [],
+                'budget_tier'     => $t->budget_tier,
+                'color_from'      => $t->color_from,
+                'color_to'        => $t->color_to,
+                'is_egyptian'     => (bool) $t->is_egyptian,
+                'spots_total'     => $t->spots_total,
+                'spots_left'      => $t->spots_left,
+                'departure_dates' => $t->departure_dates ?? [],
+                'image'           => $t->getFirstMediaUrl('image') ?: null,
+            ])
+            ->values();
+    @endphp
+    <script>window.__DB_TRIPS = @json($__dbTrips);</script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -44,8 +130,17 @@
             <div style="display:flex; align-items:center; gap:0.25rem;" class="desktop-nav">
                 <a href="{{ route('home') }}" class="nav-link" data-i18n="navHome">الرئيسية</a>
                 <a href="{{ route('home') }}#world-trips" class="nav-link" data-i18n="navTrips">الرحلات</a>
+                <a href="{{ route('destinations.index') }}" class="nav-link {{ request()->routeIs('destinations.index') ? 'active' : '' }}" data-i18n="navDestinations">كل الوجهات</a>
                 <a href="{{ route('home') }}#egypt-destinations" class="nav-link" data-i18n="navEgypt">وجهات مصر</a>
-                <a href="{{ route('survey.index') }}" class="nav-link" data-i18n="navSurvey">الاستبيان</a>
+                @if(session('survey_response_id'))
+                <a href="{{ route('survey.results', session('survey_response_id')) }}"
+                   class="nav-link"
+                   style="color:#F0D060; border:1px solid rgba(197,160,40,0.4); border-radius:20px; padding:0.3rem 0.85rem; font-size:0.82rem;"
+                   data-i18n="navMyResults">
+                    <i class="fa-solid fa-map-location-dot fa-xs" style="margin-inline-end:0.3rem;"></i>
+                    <span data-i18n="navMyResults">{{ app()->getLocale()==='ar' ? 'رحلتي' : 'My Trips' }}</span>
+                </a>
+                @endif
             </div>
 
             {{-- Right Side --}}
@@ -109,8 +204,17 @@
         <div id="mobileMenu" style="display:none; background:rgba(13,33,55,0.98); padding:1rem 1.5rem 1.5rem; border-top:1px solid rgba(197,160,40,0.2);">
             <a href="{{ route('home') }}" class="nav-link" style="display:block; padding:0.75rem 0; border-bottom:1px solid rgba(255,255,255,0.06);" data-i18n="navHome">الرئيسية</a>
             <a href="{{ route('home') }}#world-trips" class="nav-link" style="display:block; padding:0.75rem 0; border-bottom:1px solid rgba(255,255,255,0.06);" data-i18n="navTrips">الرحلات</a>
+            <a href="{{ route('destinations.index') }}" class="nav-link" style="display:block; padding:0.75rem 0; border-bottom:1px solid rgba(255,255,255,0.06);" data-i18n="navDestinations">كل الوجهات</a>
             <a href="{{ route('home') }}#egypt-destinations" class="nav-link" style="display:block; padding:0.75rem 0; border-bottom:1px solid rgba(255,255,255,0.06);" data-i18n="navEgypt">وجهات مصر</a>
-            <a href="{{ route('survey.index') }}" class="nav-link" style="display:block; padding:0.75rem 0;" data-i18n="navSurvey">الاستبيان</a>
+            <a href="{{ route('survey.index') }}" class="nav-link" style="display:block; padding:0.75rem 0; border-bottom:1px solid rgba(255,255,255,0.06);" data-i18n="navSurvey">الاستبيان</a>
+            @if(session('survey_response_id'))
+            <a href="{{ route('survey.results', session('survey_response_id')) }}"
+               class="nav-link"
+               style="display:block; padding:0.75rem 0; color:#F0D060; font-weight:700;">
+                <i class="fa-solid fa-map-location-dot fa-xs" style="margin-inline-end:0.4rem;"></i>
+                {{ app()->getLocale()==='ar' ? 'رحلتي' : 'My Trips' }}
+            </a>
+            @endif
         </div>
     </nav>
 
@@ -261,18 +365,23 @@
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
 
     // ── Currency Converter ──────────────────────────────────────
-    // Rates relative to USD (approximate, update periodically)
+    @php $liveRates = app(\App\Services\CurrencyService::class)->getRates(); @endphp
     const RATES = {
         USD: 1,
-        EUR: 0.92,
-        GBP: 0.79,
-        EGP: 49.5,
-        SAR: 3.75,
-        AED: 3.67,
-        KWD: 0.307,
-        QAR: 3.64,
+        EUR: {{ $liveRates['EUR'] ?? 0.92 }},
+        GBP: {{ $liveRates['GBP'] ?? 0.79 }},
+        EGP: {{ $liveRates['EGP'] ?? 50 }},
+        SAR: {{ $liveRates['SAR'] ?? 3.75 }},
+        AED: {{ $liveRates['AED'] ?? 3.67 }},
+        KWD: {{ $liveRates['KWD'] ?? 0.307 }},
+        QAR: {{ $liveRates['QAR'] ?? 3.64 }},
     };
-    const SYMBOLS = { USD:'$', EUR:'€', GBP:'£', EGP:'E£', SAR:'ر.س', AED:'د.إ', KWD:'د.ك', QAR:'ر.ق' };
+    const SYMBOLS_AR = { USD:'$', EUR:'€', GBP:'£', EGP:'E£', SAR:'ر.س', AED:'د.إ', KWD:'د.ك', QAR:'ر.ق' };
+    const SYMBOLS_EN = { USD:'$', EUR:'€', GBP:'£', EGP:'E£', SAR:'SAR ', AED:'AED ', KWD:'KWD ', QAR:'QAR ' };
+    function getSymbols() {
+        return document.documentElement.lang === 'ar' ? SYMBOLS_AR : SYMBOLS_EN;
+    }
+    const SYMBOLS = new Proxy({}, { get: (_, k) => getSymbols()[k] });
 
     let activeCurrency = localStorage.getItem('site_currency') || 'USD';
 
@@ -283,6 +392,7 @@
 
     function selectCurrency(code, symbol) {
         activeCurrency = code;
+        window.__activeCurrency = code;
         localStorage.setItem('site_currency', code);
         document.getElementById('currencyBtnLabel').textContent = code;
         document.getElementById('currencyMenu').style.display = 'none';
@@ -291,7 +401,7 @@
             btn.style.color = btn.dataset.currency === code ? '#F0D060' : '#C8D4E0';
             btn.style.fontWeight = btn.dataset.currency === code ? '800' : 'normal';
         });
-        convertAllPrices();
+        window.__convertAllPrices();
     }
 
     function convertAllPrices() {

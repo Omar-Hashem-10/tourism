@@ -8,9 +8,6 @@
         <div class="admin-page-title">{{ __('admin.testimonials_title') }}</div>
         <div class="admin-page-subtitle">{{ $testimonials->total() }}</div>
     </div>
-    <a href="{{ route('admin.testimonials.create') }}" class="admin-btn admin-btn-primary">
-        <i class="fa-solid fa-plus"></i> {{ __('admin.add_testimonial') }}
-    </a>
 </div>
 
 <div class="admin-card">
@@ -57,8 +54,10 @@
                         @endif
                     </td>
                     <td>
-                        <div style="display:flex; gap:0.3rem;">
-                            <a href="{{ route('admin.testimonials.edit', $t) }}" class="admin-btn admin-btn-secondary admin-btn-sm"><i class="fa-solid fa-pen"></i></a>
+                        <div style="display:flex; gap:0.4rem;">
+                            <a href="{{ route('admin.testimonials.show', $t) }}" class="admin-btn admin-btn-secondary admin-btn-sm">
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
                             <form method="POST" action="{{ route('admin.testimonials.destroy', $t) }}" onsubmit="return confirm('{{ __('admin.confirm_delete_testimonial') }}')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm"><i class="fa-solid fa-trash"></i></button>

@@ -6,18 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\NewsletterSubscriber;
 use App\Models\Trip;
-use App\Models\User;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         $totalBookings    = Booking::count();
-        $pendingBookings  = Booking::where('status', 'pending')->count();
         $totalRevenue     = Booking::where('status', 'confirmed')->sum('total_price');
-        $activeTrips      = Trip::where('is_active', true)->count();
+        $activeTrips      = Trip::active()->count();
         $totalSubscribers = NewsletterSubscriber::count();
-        $totalUsers       = User::count();
 
         $recentBookings = Booking::with('trip')
             ->latest()
@@ -39,8 +36,8 @@ class DashboardController extends Controller
             ->get();
 
         return view('admin.dashboard.index', compact(
-            'totalBookings', 'pendingBookings', 'totalRevenue',
-            'activeTrips', 'totalSubscribers', 'totalUsers',
+            'totalBookings', 'totalRevenue',
+            'activeTrips', 'totalSubscribers',
             'recentBookings', 'topTrips', 'monthlyBookings'
         ));
     }

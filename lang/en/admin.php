@@ -11,6 +11,7 @@ return [
     'nav_content'        => 'Content',
     'nav_trips'          => 'Trips',
     'nav_destinations'   => 'Destinations',
+    'nav_countries'      => 'Countries',
     'nav_testimonials'   => 'Testimonials',
     'nav_sales'          => 'Sales',
     'nav_bookings'       => 'Bookings',
@@ -56,7 +57,6 @@ return [
     'showing'            => 'Showing :from–:to of :total',
 
     // ── Statuses ──────────────────────────────────────────────────
-    'status_pending'     => 'Pending',
     'status_confirmed'   => 'Confirmed',
     'status_cancelled'   => 'Cancelled',
     'status_completed'   => 'Completed',
@@ -149,19 +149,49 @@ return [
     'spots'                   => 'Seats',
     'total_spots'             => 'Total Seats',
     'available_spots'         => 'Available Seats',
-    'day'                     => 'day',
     'publishing'              => 'Publishing',
     'is_active_label'         => 'Active',
     'is_egyptian'             => 'Egyptian Trip',
     'departure_dates'         => 'Departure Dates',
     'add_date'                => 'Add Date',
     'gallery'                 => 'Photo Gallery',
+    'per_image'               => 'per image',
+    'gallery_delete_hint'     => 'Click the delete icon to mark an image for removal on save.',
     'highlights'              => 'Highlights',
+    'program_includes'        => "What's Included?",
+    'included_items'          => 'Included in Program',
+    'excluded_items'          => 'Not Included',
+    'daily_program'           => 'Daily Itinerary',
+    'day'                     => 'Day',
+    'add_item'                => 'Add Item',
+    'sync_days'               => 'Sync Days with Duration',
     'save_trip'               => 'Save Trip',
     'no_trips'                => 'No trips',
     'confirm_delete_trip'     => 'Are you sure to delete this trip?',
     'toggle_active_hint'      => 'Active — click to deactivate',
     'toggle_inactive_hint'    => 'Inactive — click to activate',
+
+    // ── Countries ─────────────────────────────────────────────────
+    'countries_title'           => 'Countries',
+    'country_label'             => 'Country',
+    'countries_count'           => 'countries',
+    'add_country'               => 'Add Country',
+    'add_new_country'           => 'Add New Country',
+    'flag_label'                => 'Flag',
+    'flag_hint'                 => 'Paste the flag emoji here, e.g. 🇪🇬',
+    'slug_hint'                 => 'Lowercase letters and hyphens only, e.g. egypt',
+    'destinations_count_col'    => 'Destinations',
+    'no_countries'              => 'No countries added yet',
+    'confirm_delete_country'    => 'Delete this country?',
+    'country_created'           => 'Country added successfully.',
+    'country_updated'           => 'Country updated successfully.',
+    'country_deleted'           => 'Country deleted.',
+    'country_has_destinations'  => 'Cannot delete country because it has linked destinations.',
+    'country'                   => 'Country',
+    'select_country'            => 'Select country...',
+    'destination_created'       => 'Destination added successfully.',
+    'destination_updated'       => 'Destination updated successfully.',
+    'destination_deleted'       => 'Destination deleted.',
 
     // ── Destinations ──────────────────────────────────────────────
     'destinations_title'          => 'Destinations',
@@ -174,6 +204,8 @@ return [
     'no_destinations'             => 'No destinations',
     'confirm_delete_destination'  => 'Delete this destination?',
     'featured_destination'        => 'Featured Destination',
+    'destination'                 => 'Destination',
+    'none'                        => 'None',
 
     // ── Testimonials ──────────────────────────────────────────────
     'testimonials_title'          => 'Testimonials',
@@ -210,6 +242,16 @@ return [
     'no_subscribers'              => 'No subscribers',
     'confirm_delete_subscriber'   => 'Delete this subscriber?',
 
+    // ── Newsletter Campaign ────────────────────────────────────────
+    'send_newsletter'           => 'Send Newsletter',
+    'newsletter_recipients'     => 'Recipients',
+    'newsletter_to_subscribers' => 'Subscribers only',
+    'newsletter_to_bookers'     => 'Booking customers only',
+    'newsletter_to_all'         => 'Everyone',
+    'newsletter_subject'        => 'Email Subject',
+    'newsletter_body'           => 'Message Body',
+    'newsletter_sent'           => 'Email queued for :count recipient(s).',
+
     // ── Surveys ───────────────────────────────────────────────────
     'surveys_title'           => 'Survey Results',
     'surveys_page_title'      => 'Survey Results',
@@ -230,6 +272,17 @@ return [
     'settings_contact'        => 'Contact Info',
     'settings_social'         => 'Social Media Links',
     'save_all_settings'       => 'Save All Settings',
+
+    // ── SEO ───────────────────────────────────────────────────
+    'seo_section'               => 'Search Engine Optimization (SEO)',
+    'seo_optional_hint'         => 'Optional — overrides title/description in search results',
+    'meta_title_ar'             => 'Page Title (Arabic)',
+    'meta_title_en'             => 'Page Title (English)',
+    'meta_desc_ar'              => 'Meta Description (Arabic)',
+    'meta_desc_en'              => 'Meta Description (English)',
+    'meta_keywords_ar'          => 'Keywords (Arabic)',
+    'meta_keywords_en'          => 'Keywords (English)',
+    'meta_keywords_placeholder' => 'e.g. trip, hurghada, egypt tourism',
 
     // ── Auth / Login ──────────────────────────────────────────────
     'login_page_title'        => 'Login — Dashboard',

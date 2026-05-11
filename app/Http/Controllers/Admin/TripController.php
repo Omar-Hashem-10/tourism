@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\TripRequest;
+use App\Models\Destination;
 use App\Models\Trip;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -14,17 +16,17 @@ class TripController extends Controller
         $query = Trip::query();
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = $request->input('search');
             $query->whereRaw("JSON_EXTRACT(title, '$.ar') LIKE ?", ["%$search%"])
                   ->orWhereRaw("JSON_EXTRACT(title, '$.en') LIKE ?", ["%$search%"]);
         }
 
         if ($request->filled('category')) {
-            $query->where('category', $request->category);
+            $query->where('category', $request->input('category'));
         }
 
         if ($request->filled('status')) {
-            $query->where('is_active', $request->status === 'active');
+            $query->where('is_active', $request->input('status') === 'active');
         }
 
         $trips = $query->orderBy('sort_order')->orderBy('id')->paginate(15)->withQueryString();
@@ -34,12 +36,13 @@ class TripController extends Controller
 
     public function create()
     {
-        return view('admin.trips.create');
+        $destinations = Destination::orderBy('sort_order')->orderBy('id')->get();
+        return view('admin.trips.create', compact('destinations'));
     }
 
-    public function store(Request $request)
+    public function store(TripRequest $request)
     {
-        $validated = $this->validateTrip($request);
+        $validated = $request->validated();
         $validated['currency'] = '$';
         $validated['highlight_images'] = $this->storeHighlightImages($request);
 
@@ -48,11 +51,6 @@ class TripController extends Controller
         if ($request->hasFile('image')) {
             $trip->addMediaFromRequest('image')
                 ->toMediaCollection('image');
-        }
-
-        if ($request->hasFile('flag')) {
-            $trip->addMediaFromRequest('flag')
-                ->toMediaCollection('flag');
         }
 
         if ($request->hasFile('gallery')) {
@@ -70,12 +68,13 @@ class TripController extends Controller
 
     public function edit(Trip $trip)
     {
-        return view('admin.trips.edit', compact('trip'));
+        $destinations = Destination::orderBy('sort_order')->orderBy('id')->get();
+        return view('admin.trips.edit', compact('trip', 'destinations'));
     }
 
-    public function update(Request $request, Trip $trip)
+    public function update(TripRequest $request, Trip $trip)
     {
-        $validated = $this->validateTrip($request);
+        $validated = $request->validated();
         $validated['currency'] = $trip->currency ?: '$';
 
         $existing = $trip->highlight_images ?? [];
@@ -89,13 +88,6 @@ class TripController extends Controller
                 ->toMediaCollection('image');
         }
 
-        if ($request->hasFile('flag')) {
-            $trip->clearMediaCollection('flag');
-            $trip->addMediaFromRequest('flag')
-                ->toMediaCollection('flag');
-        }
-
-        // حذف صور gallery محددة
         if ($request->has('gallery_delete')) {
             foreach ($request->input('gallery_delete', []) as $mediaId) {
                 $media = Media::find($mediaId);
@@ -140,41 +132,7 @@ class TripController extends Controller
         ]);
     }
 
-    private function validateTrip(Request $request): array
-    {
-        return $request->validate([
-            'title.ar'            => 'required|string|max:200',
-            'title.en'            => 'required|string|max:200',
-            'country.ar'          => 'required|string|max:100',
-            'country.en'          => 'required|string|max:100',
-            'desc.ar'             => 'required|string',
-            'desc.en'             => 'required|string',
-            'highlights.ar'       => 'required|array|min:1',
-            'highlights.ar.*'     => 'required|string',
-            'highlights.en'       => 'required|array|min:1',
-            'highlights.en.*'     => 'required|string',
-            'highlight_images.*'  => 'nullable|image|max:2048',
-            'gallery.*'           => 'nullable|image|max:4096',
-            'flag'                => 'nullable|image|max:512',
-            'price'               => 'required|numeric|min:0',
-            'duration'            => 'required|integer|min:1',
-            'category'            => 'required|in:beach,culture,adventure',
-            'climate'             => 'required|in:beach,desert,mountain,city',
-            'travel_type'         => 'required|array|min:1',
-            'travel_type.*'       => 'in:family,couple,solo,friends',
-            'budget_tier'         => 'required|in:low,medium,high,luxury',
-            'is_egyptian'         => 'boolean',
-            'spots_total'         => 'required|integer|min:1',
-            'spots_left'          => 'required|integer|min:0',
-            'departure_dates'     => 'nullable|array',
-            'departure_dates.*'   => 'date',
-            'image'               => 'nullable|image|max:2048',
-            'is_active'           => 'boolean',
-            'sort_order'          => 'nullable|integer|min:0',
-        ]);
-    }
-
-    private function storeHighlightImages(Request $request, array $existing = []): array
+    private function storeHighlightImages(TripRequest $request, array $existing = []): array
     {
         $images = $existing;
         if ($request->hasFile('highlight_images')) {

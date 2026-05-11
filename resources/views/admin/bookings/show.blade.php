@@ -41,7 +41,7 @@
                 <div style="display:flex; align-items:center; gap:0.75rem;">
                     <div>
                         <div style="font-weight:800; font-size:1rem;">{{ $booking->trip->getTranslation('title', app()->getLocale()) }}</div>
-                        <div style="font-size:0.85rem; color:#64748B;">{{ $booking->trip->getTranslation('country', app()->getLocale()) }} · {{ $booking->trip->duration }} {{ __('admin.day') }}</div>
+                        <div style="font-size:0.85rem; color:#64748B;">{{ $booking->trip->destination?->getTranslation('name', app()->getLocale()) ?? '—' }} · {{ $booking->trip->duration }} {{ __('admin.day') }}</div>
                     </div>
                 </div>
             </div>
@@ -75,7 +75,7 @@
                 @endforeach
                 <div style="display:flex; justify-content:space-between; padding:0.75rem 0; font-size:1rem; margin-top:0.25rem;">
                     <span style="font-weight:800; color:#1A3A5C;">{{ __('admin.total') }}</span>
-                    <span style="font-weight:900; color:#059669; font-size:1.2rem;">${{ number_format($booking->total_price, 0) }}</span>
+                    <span style="font-weight:900; color:#059669; font-size:1.2rem;" data-price-usd="{{ $booking->total_price }}">${{ number_format($booking->total_price, 0) }}</span>
                 </div>
             </div>
         </div>
@@ -92,7 +92,7 @@
                     @csrf @method('PATCH')
                     <div class="admin-form-group">
                         <select name="status" class="admin-select">
-                            @foreach(['pending','confirmed','cancelled','completed'] as $val)
+                            @foreach(['confirmed','cancelled','completed'] as $val)
                                 <option value="{{ $val }}" {{ $booking->status==$val?'selected':'' }}>{{ __('admin.status_'.$val) }}</option>
                             @endforeach
                         </select>

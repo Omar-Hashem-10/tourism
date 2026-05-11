@@ -15,7 +15,8 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = session('locale', 'ar');
+        $sessionKey = $request->is('admin*') ? 'admin_locale' : 'locale';
+        $locale = session($sessionKey, 'ar');
 
         if (!in_array($locale, ['ar', 'en'])) {
             $locale = 'ar';

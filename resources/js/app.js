@@ -4,7 +4,7 @@ import { initLang, applyLang, getCurrentLang, TEXTS, t } from './lang.js';
 
 // Expose everything on window so Blade inline scripts can use them
 // without needing separate Vite entry points.
-window.TRIPS_DATA       = TRIPS_DATA;
+window.TRIPS_DATA       = window.__DB_TRIPS && window.__DB_TRIPS.length ? window.__DB_TRIPS : TRIPS_DATA;
 window.matchTrips       = matchTrips;
 window.renderTripCards  = renderTripCards;
 window.filterByCategory = filterByCategory;

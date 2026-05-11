@@ -3,7 +3,7 @@
 //  Each trip has attributes that match the survey answers
 // ================================================================
 
-export const TRIPS_DATA = [
+const STATIC_TRIPS = [
     // ===== EGYPTIAN TRIPS =====
     {
         id: 1,
@@ -329,6 +329,11 @@ export const TRIPS_DATA = [
         highlights_en: ['Ksamil Beach', 'Gjirokastër', 'Lake Shkodër', 'Saranda'],
     },
 ];
+
+// Use live DB data injected by the layout, fall back to static array
+export const TRIPS_DATA = (window.__DB_TRIPS && window.__DB_TRIPS.length)
+    ? window.__DB_TRIPS
+    : STATIC_TRIPS;
 
 // ================================================================
 //  Budget mapping: survey answer → budget tier

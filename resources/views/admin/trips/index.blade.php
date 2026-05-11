@@ -63,7 +63,7 @@
                     <td>
                         <div>
                             <div style="font-weight:700;">{{ $trip->getTranslation('title', app()->getLocale()) }}</div>
-                            <div style="font-size:0.75rem; color:#64748B;">{{ $trip->getTranslation('country', app()->getLocale()) }}</div>
+                            <div style="font-size:0.75rem; color:#64748B;">{{ $trip->destination?->getTranslation('name', app()->getLocale()) ?? '—' }}</div>
                         </div>
                     </td>
                     <td>
@@ -74,7 +74,7 @@
                             {{ $budgetLabels[$trip->budget_tier] ?? $trip->budget_tier }}
                         </span>
                     </td>
-                    <td style="font-weight:700; color:#059669;">{{ $trip->currency }}{{ number_format($trip->price, 0) }}</td>
+                    <td style="font-weight:700; color:#059669;" data-price-usd="{{ $trip->price }}">${{ number_format($trip->price, 0) }}</td>
                     <td style="font-size:0.85rem;">{{ $trip->duration }} {{ __('admin.day') }}</td>
                     <td>
                         <span style="font-weight:700; color:{{ $trip->spots_left <= 3 ? '#DC2626' : ($trip->spots_left <= 7 ? '#D97706' : '#059669') }};">

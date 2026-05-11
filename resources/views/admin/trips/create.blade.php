@@ -42,26 +42,20 @@
                 </div>
             </div>
 
-            {{-- Country --}}
+            {{-- Destination --}}
             <div class="admin-card" style="margin-bottom:1.25rem;">
-                <div class="admin-card-header"><span class="admin-card-title">{{ __('admin.country_flag') }}</span></div>
+                <div class="admin-card-header"><span class="admin-card-title"><i class="fa-solid fa-map-location-dot" style="color:#C5A028;"></i> {{ __('admin.destination') }}</span></div>
                 <div style="padding:1.25rem;">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
-                        <div class="admin-form-group" style="margin:0;">
-                            <label class="admin-label">{{ __('admin.country_ar') }}</label>
-                            <input type="text" name="country[ar]" class="admin-input" value="{{ old('country.ar') }}" required>
-                        </div>
-                        <div class="admin-form-group" style="margin:0;">
-                            <label class="admin-label">{{ __('admin.country_en') }}</label>
-                            <input type="text" name="country[en]" class="admin-input" style="direction:ltr;" value="{{ old('country.en') }}" required>
-                        </div>
-                    </div>
                     <div class="admin-form-group" style="margin:0;">
-                        <label class="admin-label">{{ __('admin.flag_image') }} <span style="color:#94A3B8; font-weight:400;">(PNG/SVG/WebP)</span></label>
-                        <input type="file" name="flag" class="admin-input" accept="image/*" style="padding:0.4rem;" id="flagInput" onchange="previewFlag(this)">
-                        <div id="flagPreview" style="display:none; margin-top:0.6rem;">
-                            <img id="flagPreviewImg" src="" alt="flag" style="height:40px; border-radius:6px; border:1px solid #E2E8F0;">
-                        </div>
+                        <label class="admin-label">{{ __('admin.destination') }}</label>
+                        <select name="destination_id" class="admin-select">
+                            <option value="">— {{ __('admin.none') }} —</option>
+                            @foreach($destinations as $dest)
+                                <option value="{{ $dest->id }}" {{ old('destination_id') == $dest->id ? 'selected' : '' }}>
+                                    {{ $dest->getTranslation('name', app()->getLocale()) }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
             </div>
@@ -104,6 +98,64 @@
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
+                </div>
+            </div>
+
+            {{-- What's Included --}}
+            <div class="admin-card" style="margin-bottom:1.25rem;">
+                <div class="admin-card-header">
+                    <span class="admin-card-title"><i class="fa-solid fa-list-check" style="color:#C5A028;"></i> {{ __('admin.program_includes') }}</span>
+                </div>
+                <div style="padding:1.25rem;">
+                    {{-- Included --}}
+                    <div style="margin-bottom:1rem;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem;">
+                            <span style="font-size:0.8rem; font-weight:700; color:#1A936F; display:flex; align-items:center; gap:0.4rem;">
+                                <i class="fa-solid fa-circle-check"></i> {{ __('admin.included_items') }}
+                            </span>
+                            <button type="button" class="admin-btn admin-btn-secondary admin-btn-sm" onclick="addProgramItem('included-container')">
+                                <i class="fa-solid fa-plus"></i> {{ __('admin.add_item') }}
+                            </button>
+                        </div>
+                        <div id="included-container">
+                            <div class="program-item-row" style="display:grid; grid-template-columns:1fr 1fr 32px; gap:0.5rem; margin-bottom:0.5rem;">
+                                <input type="text" name="included[ar][]" class="admin-input" placeholder="{{ __('admin.in_arabic') }}">
+                                <input type="text" name="included[en][]" class="admin-input" style="direction:ltr;" placeholder="In English">
+                                <button type="button" class="admin-btn admin-btn-danger admin-btn-sm" onclick="this.closest('.program-item-row').remove()"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    {{-- Excluded --}}
+                    <div>
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem;">
+                            <span style="font-size:0.8rem; font-weight:700; color:#C0392B; display:flex; align-items:center; gap:0.4rem;">
+                                <i class="fa-solid fa-circle-xmark"></i> {{ __('admin.excluded_items') }}
+                            </span>
+                            <button type="button" class="admin-btn admin-btn-secondary admin-btn-sm" onclick="addProgramItem('excluded-container')">
+                                <i class="fa-solid fa-plus"></i> {{ __('admin.add_item') }}
+                            </button>
+                        </div>
+                        <div id="excluded-container">
+                            <div class="program-item-row" style="display:grid; grid-template-columns:1fr 1fr 32px; gap:0.5rem; margin-bottom:0.5rem;">
+                                <input type="text" name="excluded[ar][]" class="admin-input" placeholder="{{ __('admin.in_arabic') }}">
+                                <input type="text" name="excluded[en][]" class="admin-input" style="direction:ltr;" placeholder="In English">
+                                <button type="button" class="admin-btn admin-btn-danger admin-btn-sm" onclick="this.closest('.program-item-row').remove()"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Daily Program --}}
+            <div class="admin-card" style="margin-bottom:1.25rem;">
+                <div class="admin-card-header">
+                    <span class="admin-card-title"><i class="fa-solid fa-calendar-days" style="color:#C5A028;"></i> {{ __('admin.daily_program') }}</span>
+                    <button type="button" class="admin-btn admin-btn-secondary admin-btn-sm" onclick="syncItineraryDays()">
+                        <i class="fa-solid fa-rotate"></i> {{ __('admin.sync_days') }}
+                    </button>
+                </div>
+                <div style="padding:1.25rem;" id="itinerary-container">
+                    {{-- rows populated by JS on load / duration change --}}
                 </div>
             </div>
 
@@ -176,7 +228,7 @@
                     </div>
                     <div class="admin-form-group" style="margin:0;">
                         <label class="admin-label">{{ __('admin.duration_days') }}</label>
-                        <input type="number" name="duration" class="admin-input" value="{{ old('duration') }}" min="1" required>
+                        <input type="number" name="duration" id="durationInput" class="admin-input" value="{{ old('duration') }}" min="1" required>
                     </div>
                 </div>
             </div>
@@ -252,6 +304,56 @@
                 </div>
             </div>
 
+            {{-- SEO --}}
+            <div class="admin-card" style="margin-bottom:1.25rem;">
+                <div class="admin-card-header">
+                    <span class="admin-card-title"><i class="fa-solid fa-magnifying-glass" style="color:#C5A028;"></i> {{ __('admin.seo_section') }}</span>
+                    <span style="font-size:0.75rem; color:#888;">{{ __('admin.seo_optional_hint') }}</span>
+                </div>
+                <div style="padding:1.25rem; display:flex; flex-direction:column; gap:1rem;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="admin-form-group" style="margin:0;">
+                            <label class="admin-label">{{ __('admin.meta_title_ar') }} <span id="mt_ar_count" style="float:inline-end; font-weight:400; color:#aaa; font-size:0.78rem;">0/60</span></label>
+                            <input type="text" name="meta_title[ar]" class="admin-input" maxlength="60"
+                                   value="{{ old('meta_title.ar') }}"
+                                   oninput="document.getElementById('mt_ar_count').textContent=this.value.length+'/60'">
+                        </div>
+                        <div class="admin-form-group" style="margin:0;">
+                            <label class="admin-label">{{ __('admin.meta_title_en') }} <span id="mt_en_count" style="float:inline-end; font-weight:400; color:#aaa; font-size:0.78rem;">0/60</span></label>
+                            <input type="text" name="meta_title[en]" class="admin-input" style="direction:ltr;" maxlength="60"
+                                   value="{{ old('meta_title.en') }}"
+                                   oninput="document.getElementById('mt_en_count').textContent=this.value.length+'/60'">
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="admin-form-group" style="margin:0;">
+                            <label class="admin-label">{{ __('admin.meta_desc_ar') }} <span id="md_ar_count" style="float:inline-end; font-weight:400; color:#aaa; font-size:0.78rem;">0/160</span></label>
+                            <textarea name="meta_desc[ar]" class="admin-textarea" rows="3" maxlength="160"
+                                      oninput="document.getElementById('md_ar_count').textContent=this.value.length+'/160'">{{ old('meta_desc.ar') }}</textarea>
+                        </div>
+                        <div class="admin-form-group" style="margin:0;">
+                            <label class="admin-label">{{ __('admin.meta_desc_en') }} <span id="md_en_count" style="float:inline-end; font-weight:400; color:#aaa; font-size:0.78rem;">0/160</span></label>
+                            <textarea name="meta_desc[en]" class="admin-textarea" rows="3" style="direction:ltr;" maxlength="160"
+                                      oninput="document.getElementById('md_en_count').textContent=this.value.length+'/160'">{{ old('meta_desc.en') }}</textarea>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="admin-form-group" style="margin:0;">
+                            <label class="admin-label">{{ __('admin.meta_keywords_ar') }}</label>
+                            <input type="text" name="meta_keywords[ar]" class="admin-input"
+                                   placeholder="{{ __('admin.meta_keywords_placeholder') }}"
+                                   value="{{ old('meta_keywords.ar') }}">
+                        </div>
+                        <div class="admin-form-group" style="margin:0;">
+                            <label class="admin-label">{{ __('admin.meta_keywords_en') }}</label>
+                            <input type="text" name="meta_keywords[en]" class="admin-input" style="direction:ltr;"
+                                   placeholder="e.g. hurghada, beach trip, egypt"
+                                   value="{{ old('meta_keywords.en') }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <button type="submit" class="admin-btn admin-btn-primary" style="width:100%; justify-content:center; padding:0.75rem; font-size:0.95rem;">
                 <i class="fa-solid fa-floppy-disk"></i> {{ __('admin.save_trip') }}
             </button>
@@ -275,15 +377,6 @@ function previewGallery(input) {
         };
         reader.readAsDataURL(file);
     });
-}
-
-function previewFlag(input) {
-    const preview = document.getElementById('flagPreview');
-    const img = document.getElementById('flagPreviewImg');
-    if (input.files && input.files[0]) {
-        img.src = URL.createObjectURL(input.files[0]);
-        preview.style.display = 'block';
-    }
 }
 
 function previewHl(input) {
@@ -319,6 +412,61 @@ document.getElementById('add-highlight').addEventListener('click', function() {
 document.getElementById('highlights-container').addEventListener('click', function(e) {
     if (e.target.closest('.remove-highlight')) {
         e.target.closest('.highlight-row').remove();
+    }
+});
+
+// ── Program includes / itinerary helpers ──
+function addProgramItem(containerId, namePrefix, arVal, enVal) {
+    const c   = document.getElementById(containerId);
+    const key = containerId === 'included-container' ? 'included' : 'excluded';
+    const row = document.createElement('div');
+    row.className = 'program-item-row';
+    row.style.cssText = 'display:grid; grid-template-columns:1fr 1fr 32px; gap:0.5rem; margin-bottom:0.5rem;';
+    row.innerHTML = `
+        <input type="text" name="${key}[ar][]" class="admin-input" placeholder="{{ __('admin.in_arabic') }}" value="${arVal||''}">
+        <input type="text" name="${key}[en][]" class="admin-input" style="direction:ltr;" placeholder="In English" value="${enVal||''}">
+        <button type="button" class="admin-btn admin-btn-danger admin-btn-sm" onclick="this.closest('.program-item-row').remove()"><i class="fa-solid fa-xmark"></i></button>`;
+    c.appendChild(row);
+}
+
+function syncItineraryDays() {
+    const dur = parseInt(document.getElementById('durationInput').value) || 0;
+    const container = document.getElementById('itinerary-container');
+    const existing  = container.querySelectorAll('.itinerary-day');
+    const current   = existing.length;
+
+    if (dur > current) {
+        for (let d = current + 1; d <= dur; d++) addItineraryDay(d);
+    } else if (dur < current) {
+        for (let i = current; i > dur; i--) existing[i - 1].remove();
+    }
+}
+
+function addItineraryDay(dayNum, arVal, enVal) {
+    const container = document.getElementById('itinerary-container');
+    const block = document.createElement('div');
+    block.className = 'itinerary-day';
+    block.style.cssText = 'margin-bottom:1.25rem; padding-bottom:1.25rem; border-bottom:1px solid #F1F5F9;';
+    block.innerHTML = `
+        <div style="font-weight:700; font-size:0.85rem; color:#1A3A5C; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.4rem;">
+            <span style="width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,#C5A028,#F0D060); display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; color:#1A1A1A;">${dayNum}</span>
+            {{ __('admin.day') }} ${dayNum}
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <textarea name="itinerary[ar][]" class="admin-textarea" rows="2" placeholder="{{ __('admin.in_arabic') }}">${arVal||''}</textarea>
+            <textarea name="itinerary[en][]" class="admin-textarea" rows="2" style="direction:ltr;" placeholder="In English">${enVal||''}</textarea>
+        </div>`;
+    container.appendChild(block);
+}
+
+// Sync on duration change
+document.addEventListener('DOMContentLoaded', function() {
+    const durInput = document.getElementById('durationInput');
+    if (durInput) {
+        durInput.addEventListener('change', syncItineraryDays);
+        durInput.addEventListener('input',  syncItineraryDays);
+        // Init on load
+        if (parseInt(durInput.value) > 0) syncItineraryDays();
     }
 });
 

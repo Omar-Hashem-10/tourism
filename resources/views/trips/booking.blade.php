@@ -1,11 +1,12 @@
 @extends('layouts.app')
-@section('title', 'حجز الرحلة — رحلاتي')
+@section('title', app()->getLocale() == 'ar' ? 'حجز الرحلة — رحلاتي' : 'Book Trip — Rahalaty')
+@section('meta_robots', 'noindex, nofollow')
 
 @php
     $lang    = app()->getLocale();
     $isAr    = $lang === 'ar';
     $tripTitle   = $trip->getTranslation('title',   $lang);
-    $tripCountry = $trip->getTranslation('country', $lang);
+    $tripCountry = $trip->destination?->getTranslation('name', $lang) ?? '';
     $durationLabel = $isAr ? "{$trip->duration} أيام" : "{$trip->duration} Days";
     $departureDates = $trip->departure_dates ?? [];
     $spotsColor = $trip->spots_left <= 3 ? '#C0392B' : ($trip->spots_left <= 7 ? '#E67E22' : '#1A936F');
@@ -65,45 +66,9 @@
 .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
 @media(max-width:500px){ .form-row{ grid-template-columns:1fr; } }
 
-/* ── Payment methods ── */
-.payment-grid {
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:0.75rem;
-}
-.payment-option { display:none; }
-.payment-label {
-    border:2px solid #e2e8f0; border-radius:12px; padding:1rem 0.75rem;
-    cursor:pointer; transition:all 0.2s; text-align:center;
-    display:flex; flex-direction:column; align-items:center; gap:0.5rem;
-    background:white; user-select:none;
-}
-.payment-label:hover { border-color:#C5A028; background:#fffdf0; }
-.payment-option:checked + .payment-label {
-    border-color:#C5A028; background:linear-gradient(135deg,#fffdf0,#fff9e6);
-    box-shadow:0 4px 16px rgba(197,160,40,0.2);
-}
-.payment-icon {
-    width:48px; height:48px; border-radius:10px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:1.5rem; margin-bottom:0.1rem;
-}
-.payment-name { font-size:0.82rem; font-weight:700; color:#1A3A5C; }
-.payment-sub  { font-size:0.7rem; color:#888; }
-
-/* ── Dynamic payment fields ── */
-.pay-fields { display:none; margin-top:1.25rem; }
-.pay-fields.active { display:block; }
-.card-input-wrap { position:relative; }
-.card-input-wrap i {
-    position:absolute; top:50%; transform:translateY(-50%);
-    inset-inline-end:0.9rem; color:#888; pointer-events:none;
-}
-
-/* ── Card icons row ── */
-.card-brands { display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap; }
-.card-brand-badge {
-    padding:0.2rem 0.6rem; border-radius:6px; font-size:0.7rem;
-    font-weight:700; border:1px solid #ddd; color:#555;
-    display:flex; align-items:center; gap:0.3rem;
+/* ── Paymob badge ── */
+.paymob-badge {
+    border:2px solid #e8f4fd; border-radius:12px; padding:1.25rem; background:#f8fbff;
 }
 
 /* ── Summary sidebar ── */
@@ -165,10 +130,9 @@
     {{-- Header --}}
     <div class="book-header">
         <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
-            <div style="font-size:2.5rem;">{{ $trip->flag }}</div>
             <div>
                 <h1>{{ $tripTitle }}</h1>
-                <p>{{ $tripCountry }} · {{ $durationLabel }} · {{ $isAr ? 'يبدأ من' : 'from' }} {{ $trip->currency }}{{ $trip->price }}</p>
+                <p>{{ $tripCountry }} · {{ $durationLabel }} · {{ $isAr ? 'يبدأ من' : 'from' }} <span data-price-usd="{{ $trip->price }}">{{ $trip->currency }}{{ $trip->price }}</span></p>
             </div>
         </div>
     </div>
@@ -317,142 +281,38 @@
             <div class="form-card">
                 <div class="form-section">
                     <div class="form-section-title">
-                        <i class="fa-solid fa-credit-card"></i> <span data-i18n="bookSectionPayment">طريقة الدفع</span>
-                    </div>
-                    @error('payment_method')<div class="field-error" style="margin-bottom:0.75rem;">{{ $message }}</div>@enderror
-
-                    <div class="payment-grid">
-
-                        {{-- Credit Card --}}
-                        <div>
-                            <input type="radio" name="payment_method" id="pm_cc" value="credit_card" class="payment-option" {{ old('payment_method')=='credit_card'?'checked':'' }}>
-                            <label for="pm_cc" class="payment-label">
-                                <div class="payment-icon" style="background:linear-gradient(135deg,#1A3A5C,#2A5A8C);">
-                                    <i class="fa-solid fa-credit-card" style="color:white;"></i>
-                                </div>
-                                <span class="payment-name" data-i18n="bookPmCreditCard">بطاقة ائتمان</span>
-                                <span class="payment-sub">Credit Card</span>
-                            </label>
-                        </div>
-
-                        {{-- Visa --}}
-                        <div>
-                            <input type="radio" name="payment_method" id="pm_visa" value="visa" class="payment-option" {{ old('payment_method')=='visa'?'checked':'' }}>
-                            <label for="pm_visa" class="payment-label">
-                                <div class="payment-icon" style="background:#1A1F71;">
-                                    <i class="fa-brands fa-cc-visa" style="color:white; font-size:1.8rem;"></i>
-                                </div>
-                                <span class="payment-name">Visa</span>
-                                <span class="payment-sub">فيزا</span>
-                            </label>
-                        </div>
-
-                        {{-- Meeza --}}
-                        <div>
-                            <input type="radio" name="payment_method" id="pm_meeza" value="meeza" class="payment-option" {{ old('payment_method')=='meeza'?'checked':'' }}>
-                            <label for="pm_meeza" class="payment-label">
-                                <div class="payment-icon" style="background:linear-gradient(135deg,#CE1126,#8B0000);">
-                                    <i class="fa-solid fa-id-card" style="color:white;"></i>
-                                </div>
-                                <span class="payment-name">ميزة</span>
-                                <span class="payment-sub">Meeza Card</span>
-                            </label>
-                        </div>
-
-                        {{-- InstaPay --}}
-                        <div>
-                            <input type="radio" name="payment_method" id="pm_instapay" value="instapay" class="payment-option" {{ old('payment_method')=='instapay'?'checked':'' }}>
-                            <label for="pm_instapay" class="payment-label">
-                                <div class="payment-icon" style="background:linear-gradient(135deg,#7B2FBE,#5A189A);">
-                                    <i class="fa-solid fa-bolt" style="color:white;"></i>
-                                </div>
-                                <span class="payment-name">InstaPay</span>
-                                <span class="payment-sub">انستاباي</span>
-                            </label>
-                        </div>
-
-                        {{-- Vodafone Cash --}}
-                        <div>
-                            <input type="radio" name="payment_method" id="pm_vf" value="vodafone_cash" class="payment-option" {{ old('payment_method')=='vodafone_cash'?'checked':'' }}>
-                            <label for="pm_vf" class="payment-label">
-                                <div class="payment-icon" style="background:#E60000;">
-                                    <i class="fa-solid fa-mobile-screen-button" style="color:white;"></i>
-                                </div>
-                                <span class="payment-name">فودافون كاش</span>
-                                <span class="payment-sub">Vodafone Cash</span>
-                            </label>
-                        </div>
-
+                        <i class="fa-solid fa-credit-card"></i> <span>{{ $isAr ? 'طريقة الدفع' : 'Payment Method' }}</span>
                     </div>
 
-                    {{-- Card fields (Credit Card / Visa / Meeza) --}}
-                    <div class="pay-fields" id="fields_card">
-                        <div class="card-brands">
-                            <span class="card-brand-badge"><i class="fa-brands fa-cc-visa"></i> Visa</span>
-                            <span class="card-brand-badge"><i class="fa-brands fa-cc-mastercard"></i> Mastercard</span>
-                            <span class="card-brand-badge"><i class="fa-solid fa-id-card" style="color:#CE1126;"></i> Meeza</span>
-                        </div>
-                        <div class="form-group card-input-wrap">
-                            <label class="form-label"><span data-i18n="bookCardNumber">رقم البطاقة</span> <span>*</span></label>
-                            <input type="text" class="form-control" placeholder="1234  5678  9012  3456" maxlength="19" id="cardNumber" oninput="formatCard(this)">
-                            <i class="fa-solid fa-credit-card"></i>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label"><span data-i18n="bookCardExpiry">تاريخ الانتهاء</span> <span>*</span></label>
-                                <input type="text" class="form-control" placeholder="MM / YY" maxlength="7" id="cardExpiry" oninput="formatExpiry(this)">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">CVV <span>*</span></label>
-                                <input type="text" class="form-control" placeholder="123" maxlength="4" id="cardCvv">
+                    <input type="hidden" name="payment_method" value="paymob">
+
+                    <div class="paymob-badge">
+                        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.85rem;">
+                            <img src="{{ asset('images/paymob.png') }}" alt="Paymob"
+                                 style="height:40px; width:auto; object-fit:contain; flex-shrink:0;">
+                            <div>
+                                <div style="font-weight:800; color:#1A3A5C; font-size:0.95rem;">{{ $isAr ? 'الدفع الإلكتروني الآمن' : 'Secure Online Payment' }}</div>
+                                <div style="font-size:0.78rem; color:#666;">{{ $isAr ? 'بوابة دفع معتمدة' : 'Certified payment gateway' }}</div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label"><span data-i18n="bookCardHolder">اسم حامل البطاقة</span> <span>*</span></label>
-                            <input type="text" class="form-control" data-i18n="bookCardHolderPh" placeholder="الاسم كما يظهر على البطاقة" id="cardName">
+                        <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.85rem;">
+                            <span style="padding:0.25rem 0.7rem; border-radius:6px; font-size:0.75rem; font-weight:700; border:1.5px solid #ddd; color:#1A1F71; background:white; display:flex; align-items:center; gap:0.3rem;">
+                                <i class="fa-brands fa-cc-visa"></i> Visa
+                            </span>
+                            <span style="padding:0.25rem 0.7rem; border-radius:6px; font-size:0.75rem; font-weight:700; border:1.5px solid #ddd; color:#eb001b; background:white; display:flex; align-items:center; gap:0.3rem;">
+                                <i class="fa-brands fa-cc-mastercard"></i> Mastercard
+                            </span>
+                            <span style="padding:0.25rem 0.7rem; border-radius:6px; font-size:0.75rem; font-weight:700; border:1.5px solid #ddd; color:#CE1126; background:white; display:flex; align-items:center; gap:0.3rem;">
+                                <i class="fa-solid fa-id-card"></i> Meeza
+                            </span>
                         </div>
-                        <div style="background:#f0f8ff; border-radius:8px; padding:0.7rem 0.9rem; font-size:0.8rem; color:#666; display:flex; align-items:center; gap:0.5rem;">
-                            <i class="fa-solid fa-lock" style="color:#1A936F;"></i>
-                            <span data-i18n="bookSslNote">معاملاتك محمية بتشفير SSL 256-bit</span>
-                        </div>
-                    </div>
-
-                    {{-- InstaPay fields --}}
-                    <div class="pay-fields" id="fields_instapay">
-                        <div style="background:#f5f0ff; border-radius:10px; padding:1rem; margin-bottom:1rem; font-size:0.85rem; color:#5A189A;">
-                            <i class="fa-solid fa-circle-info"></i>
-                            <span data-i18n="bookInstapayNote">أرسل المبلغ على رقم InstaPay:</span>
-                            <strong dir="ltr">01000000000</strong>
-                            <span data-i18n="bookInstapayNoteSuf">ثم أدخل رقم العملية أدناه.</span>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><span data-i18n="bookInstapayPhone">رقم هاتف InstaPay</span> <span>*</span></label>
-                            <input type="tel" class="form-control" placeholder="01X XXXX XXXX" id="instapayPhone">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><span data-i18n="bookInstapayTxn">رقم العملية (Transaction ID)</span> <span>*</span></label>
-                            <input type="text" class="form-control" placeholder="مثلاً: TXN123456789" id="instapayTxn">
+                        <div style="font-size:0.82rem; color:#555; display:flex; align-items:center; gap:0.4rem;">
+                            <i class="fa-solid fa-circle-info fa-xs" style="color:#C5A028;"></i>
+                            {{ $isAr ? 'بعد تأكيد الحجز ستُحوَّل إلى صفحة الدفع الآمنة لإتمام العملية' : 'After confirming you will be redirected to the secure payment page.' }}
                         </div>
                     </div>
 
-                    {{-- Vodafone Cash fields --}}
-                    <div class="pay-fields" id="fields_vf">
-                        <div style="background:#fff0f0; border-radius:10px; padding:1rem; margin-bottom:1rem; font-size:0.85rem; color:#B22222;">
-                            <i class="fa-solid fa-circle-info"></i>
-                            <span data-i18n="bookVfNote">أرسل المبلغ على رقم فودافون كاش:</span>
-                            <strong dir="ltr">01000000000</strong>
-                            <span data-i18n="bookVfNoteSuf">ثم أدخل رقم الإيصال أدناه.</span>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><span data-i18n="bookVfPhone">رقم هاتف فودافون كاش</span> <span>*</span></label>
-                            <input type="tel" class="form-control" placeholder="01X XXXX XXXX" id="vfPhone">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label"><span data-i18n="bookVfReceipt">رقم الإيصال</span> <span>*</span></label>
-                            <input type="text" class="form-control" placeholder="مثلاً: 123456789" id="vfReceipt">
-                        </div>
-                    </div>
-
+                    @error('payment_method')<div class="field-error" style="margin-top:0.5rem;">{{ $message }}</div>@enderror
                 </div>
             </div>
 
@@ -472,7 +332,7 @@
         <div>
             <div class="summary-card">
                 <div class="summary-header">
-                    <div style="font-size:2rem; margin-bottom:0.5rem;">{{ $trip->flag }}</div>
+                    @if($tripCountry)<div style="font-size:0.8rem; opacity:0.7; margin-bottom:0.5rem;"><i class="fa-solid fa-location-dot fa-xs"></i> {{ $tripCountry }}</div>@endif
                     <h3>{{ $isAr ? 'ملخص الحجز' : 'Booking Summary' }}</h3>
                     <div style="font-size:0.8rem; color:rgba(255,255,255,0.5); margin-top:0.25rem;">{{ $tripCountry }}</div>
                 </div>
@@ -491,7 +351,7 @@
                     </div>
                     <div class="summary-row">
                         <span class="label"><i class="fa-solid fa-dollar-sign fa-xs" style="color:#C5A028;"></i> {{ $isAr ? 'السعر/شخص' : 'Price/person' }}</span>
-                        <span class="value">{{ $trip->currency }}{{ $trip->price }}</span>
+                        <span class="value" data-price-usd="{{ $trip->price }}">{{ $trip->currency }}{{ $trip->price }}</span>
                     </div>
                     <div class="summary-total">
                         <div class="label">{{ $isAr ? 'الإجمالي' : 'Total' }}</div>
@@ -518,7 +378,7 @@
                     {{-- Submit button --}}
                     <button type="submit" form="bookingForm" class="btn-submit-booking">
                         <i class="fa-solid fa-lock fa-sm"></i>
-                        <span>{{ $isAr ? 'تأكيد الحجز والدفع' : 'Confirm Booking' }}</span>
+                        <span>{{ $isAr ? 'تأكيد الحجز — الدفع عبر Paymob' : 'Confirm & Pay via Paymob' }}</span>
                     </button>
 
                     <div style="display:flex; justify-content:center; gap:1.2rem; margin-top:1rem; flex-wrap:wrap;">
@@ -576,40 +436,30 @@ function changeCount(type, delta) {
 function updateTotal() {
     const adults   = parseInt(document.getElementById('adultsInput').value)   || 0;
     const children = parseInt(document.getElementById('childrenInput').value) || 0;
-    const total    = (TRIP_PRICE * adults) + (TRIP_PRICE * 0.5 * children);
+    const totalUsd = (TRIP_PRICE * adults) + (TRIP_PRICE * 0.5 * children);
+
+    const currency = window.__activeCurrency || 'USD';
+    const rate     = (window.__currencyRates   || {})[currency] || 1;
+    const symbol   = (window.__currencySymbols || {})[currency] || currency;
+    const total    = totalUsd * rate;
+
     const aWord = IS_AR ? (adults !== 1 ? 'بالغين' : 'بالغ') : (adults !== 1 ? 'Adults' : 'Adult');
     const cWord = IS_AR ? 'طفل' : (children !== 1 ? 'Children' : 'Child');
     document.getElementById('sumTravelers').textContent = children > 0
         ? `${adults} ${aWord} + ${children} ${cWord}`
         : `${adults} ${aWord}`;
-    document.getElementById('sumTotal').textContent = TRIP_CURRENCY + total.toLocaleString();
+    document.getElementById('sumTotal').textContent = symbol + total.toLocaleString(undefined, { maximumFractionDigits: 0 });
 }
 
-// Payment method → show/hide extra fields
-const cardMethods = ['credit_card', 'visa', 'meeza'];
-document.querySelectorAll('.payment-option').forEach(radio => {
-    radio.addEventListener('change', () => {
-        document.getElementById('fields_card').classList.remove('active');
-        document.getElementById('fields_instapay').classList.remove('active');
-        document.getElementById('fields_vf').classList.remove('active');
-        if (cardMethods.includes(radio.value))   document.getElementById('fields_card').classList.add('active');
-        else if (radio.value === 'instapay')      document.getElementById('fields_instapay').classList.add('active');
-        else if (radio.value === 'vodafone_cash') document.getElementById('fields_vf').classList.add('active');
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    updateTotal();
+    // إعادة حساب الإجمالي عند تغيير العملة
+    const _orig = window.__convertAllPrices;
+    window.__convertAllPrices = function() {
+        if (_orig) _orig();
+        updateTotal();
+    };
 });
-// Re-trigger if old value is present (validation error re-render)
-const checked = document.querySelector('.payment-option:checked');
-if (checked) checked.dispatchEvent(new Event('change'));
 
-// Card number / expiry formatting
-function formatCard(input) {
-    let v = input.value.replace(/\D/g,'').substring(0,16);
-    input.value = v.match(/.{1,4}/g)?.join('  ') || v;
-}
-function formatExpiry(input) {
-    let v = input.value.replace(/\D/g,'');
-    if (v.length >= 2) v = v.substring(0,2) + ' / ' + v.substring(2,4);
-    input.value = v;
-}
 </script>
 @endpush

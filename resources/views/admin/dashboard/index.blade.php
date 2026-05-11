@@ -16,7 +16,7 @@
     <div class="kpi-card">
         <div class="kpi-icon green"><i class="fa-solid fa-coins"></i></div>
         <div class="kpi-info">
-            <div class="kpi-value">${{ number_format($totalRevenue, 0) }}</div>
+            <div class="kpi-value" data-price-usd="{{ $totalRevenue }}">${{ number_format($totalRevenue, 0) }}</div>
             <div class="kpi-label">{{ __('admin.kpi_total_revenue') }}</div>
         </div>
     </div>
@@ -25,20 +25,6 @@
         <div class="kpi-info">
             <div class="kpi-value">{{ $activeTrips }}</div>
             <div class="kpi-label">{{ __('admin.kpi_active_trips') }}</div>
-        </div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-icon orange"><i class="fa-solid fa-clock"></i></div>
-        <div class="kpi-info">
-            <div class="kpi-value">{{ $pendingBookings }}</div>
-            <div class="kpi-label">{{ __('admin.kpi_pending_bookings') }}</div>
-        </div>
-    </div>
-    <div class="kpi-card">
-        <div class="kpi-icon purple"><i class="fa-solid fa-users"></i></div>
-        <div class="kpi-info">
-            <div class="kpi-value">{{ number_format($totalUsers) }}</div>
-            <div class="kpi-label">{{ __('admin.kpi_total_users') }}</div>
         </div>
     </div>
     <div class="kpi-card">
@@ -87,7 +73,7 @@
                         </td>
                         <td>{{ $b->trip ? $b->trip->getTranslation('title', app()->getLocale()) : '—' }}</td>
                         <td style="font-size:0.8rem;">{{ $b->travel_date?->format('Y-m-d') }}</td>
-                        <td style="font-weight:700; color:#059669;">${{ number_format($b->total_price, 0) }}</td>
+                        <td style="font-weight:700; color:#059669;" data-price-usd="{{ $b->total_price }}">${{ number_format($b->total_price, 0) }}</td>
                         <td>
                             <span class="status-badge status-{{ $b->status }}">
                                 {{ __('admin.status_' . $b->status) }}

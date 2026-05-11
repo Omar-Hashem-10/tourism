@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreSurveyRequest;
 use App\Models\SurveyResponse;
+use Illuminate\Http\Request;
 
 class SurveyController extends Controller
 {
@@ -12,20 +13,11 @@ class SurveyController extends Controller
         return view('survey.index');
     }
 
-    public function store(Request $request)
+    public function store(StoreSurveyRequest $request)
     {
-        $validated = $request->validate([
-            'name'               => ['required', 'string', 'max:100'],
-            'email'              => ['required', 'email', 'max:200'],
-            'phone'              => ['nullable', 'string', 'max:30'],
-            'budget'             => ['required', 'in:low,medium,high,luxury'],
-            'travel_type'        => ['required', 'in:family,couple,solo,friends'],
-            'preferred_climate'  => ['required', 'in:beach,desert,mountain,city'],
-            'duration_preference'=> ['required', 'in:weekend,week,twoweeks,month'],
-            'message'            => ['nullable', 'string', 'max:1000'],
-        ]);
+        $response = SurveyResponse::create($request->validated());
 
-        $response = SurveyResponse::create($validated);
+        session(['survey_response_id' => $response->id]);
 
         return redirect()->route('survey.results', $response->id);
     }

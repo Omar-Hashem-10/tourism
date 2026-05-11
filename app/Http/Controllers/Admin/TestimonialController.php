@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\TestimonialRequest;
 use App\Models\Testimonial;
-use Illuminate\Http\Request;
 
 class TestimonialController extends Controller
 {
@@ -19,17 +19,9 @@ class TestimonialController extends Controller
         return view('admin.testimonials.create');
     }
 
-    public function store(Request $request)
+    public function store(TestimonialRequest $request)
     {
-        $validated = $request->validate([
-            'name'      => 'required|string|max:100',
-            'review'    => 'required|string',
-            'rating'    => 'required|integer|min:1|max:5',
-            'is_active' => 'boolean',
-            'avatar'    => 'nullable|image|max:1024',
-        ]);
-
-        $testimonial = Testimonial::create($validated);
+        $testimonial = Testimonial::create($request->validated());
 
         if ($request->hasFile('avatar')) {
             $testimonial->addMediaFromRequest('avatar')
@@ -40,22 +32,19 @@ class TestimonialController extends Controller
             ->with('success', 'تم إضافة الرأي بنجاح.');
     }
 
+    public function show(Testimonial $testimonial)
+    {
+        return view('admin.testimonials.show', compact('testimonial'));
+    }
+
     public function edit(Testimonial $testimonial)
     {
         return view('admin.testimonials.edit', compact('testimonial'));
     }
 
-    public function update(Request $request, Testimonial $testimonial)
+    public function update(TestimonialRequest $request, Testimonial $testimonial)
     {
-        $validated = $request->validate([
-            'name'      => 'required|string|max:100',
-            'review'    => 'required|string',
-            'rating'    => 'required|integer|min:1|max:5',
-            'is_active' => 'boolean',
-            'avatar'    => 'nullable|image|max:1024',
-        ]);
-
-        $testimonial->update($validated);
+        $testimonial->update($request->validated());
 
         if ($request->hasFile('avatar')) {
             $testimonial->clearMediaCollection('avatar');
@@ -65,6 +54,15 @@ class TestimonialController extends Controller
 
         return redirect()->route('admin.testimonials.index')
             ->with('success', 'تم تحديث الرأي بنجاح.');
+    }
+
+    public function toggleActive(Testimonial $testimonial)
+    {
+        $testimonial->update(['is_active' => !$testimonial->is_active]);
+
+        return back()->with('success', $testimonial->is_active
+            ? 'تم تفعيل الرأي.'
+            : 'تم إخفاء الرأي.');
     }
 
     public function destroy(Testimonial $testimonial)
