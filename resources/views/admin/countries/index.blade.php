@@ -18,11 +18,11 @@
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th style="width:60px;">{{ __('admin.flag_label') }}</th>
-                    <th>{{ __('admin.name') }}</th>
-                    <th>Slug</th>
-                    <th style="width:120px;">{{ __('admin.destinations_count_col') }}</th>
-                    <th style="width:120px;">{{ __('admin.actions') }}</th>
+                    <th scope="col" style="width:60px;">{{ __('admin.flag_label') }}</th>
+                    <th scope="col">{{ __('admin.name') }}</th>
+                    <th scope="col">Slug</th>
+                    <th scope="col" style="width:120px;">{{ __('admin.destinations_count_col') }}</th>
+                    <th scope="col" style="width:120px;">{{ __('admin.actions') }}</th>
                 </tr>
             </thead>
             <tbody>

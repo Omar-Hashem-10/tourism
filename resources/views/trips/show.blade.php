@@ -496,7 +496,7 @@
                         <div class="gallery-item-inner" style="background:#000; padding:0;">
                             <img src="{{ $galleryMedia[$i]->getUrl() }}"
                                  style="width:100%; height:100%; object-fit:cover; opacity:0.9; transition:opacity 0.2s;"
-                                 alt="{{ $title }}"
+                                 alt="{{ $title }} — {{ $isAr ? 'صورة ' . ($i + 1) : 'photo ' . ($i + 1) }}"
                                  onmouseover="this.style.opacity='1'"
                                  onmouseout="this.style.opacity='0.9'">
                         </div>

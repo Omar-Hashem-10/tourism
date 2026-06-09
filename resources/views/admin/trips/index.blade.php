@@ -39,15 +39,15 @@
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>{{ __('admin.booking_trip') }}</th>
-                    <th>{{ __('admin.category') }}</th>
-                    <th>{{ __('admin.budget') }}</th>
-                    <th>{{ __('admin.price') }}</th>
-                    <th>{{ __('admin.duration') }}</th>
-                    <th>{{ __('admin.spots') }}</th>
-                    <th>{{ __('admin.status') }}</th>
-                    <th>{{ __('admin.actions') }}</th>
+                    <th scope="col">#</th>
+                    <th scope="col">{{ __('admin.booking_trip') }}</th>
+                    <th scope="col">{{ __('admin.category') }}</th>
+                    <th scope="col">{{ __('admin.budget') }}</th>
+                    <th scope="col">{{ __('admin.price') }}</th>
+                    <th scope="col">{{ __('admin.duration') }}</th>
+                    <th scope="col">{{ __('admin.spots') }}</th>
+                    <th scope="col">{{ __('admin.status') }}</th>
+                    <th scope="col">{{ __('admin.actions') }}</th>
                 </tr>
             </thead>
             <tbody>

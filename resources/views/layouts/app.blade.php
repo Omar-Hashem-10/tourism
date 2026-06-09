@@ -107,8 +107,13 @@
 </head>
 <body>
 
+    {{-- Skip to main content --}}
+    <a href="#main-content" class="skip-link">
+        {{ app()->getLocale() === 'ar' ? 'تخطى للمحتوى الرئيسي' : 'Skip to main content' }}
+    </a>
+
     {{-- ===================== NAVBAR ===================== --}}
-    <nav class="navbar" id="mainNav">
+    <nav class="navbar" id="mainNav" aria-label="{{ app()->getLocale() === 'ar' ? 'القائمة الرئيسية' : 'Main navigation' }}" role="navigation">
         <div style="max-width:1200px; margin:0 auto; padding:0 1.5rem; display:flex; align-items:center; justify-content:space-between; height:70px;">
 
             {{-- Logo --}}
@@ -150,12 +155,16 @@
                     <button onclick="toggleCurrencyMenu()" id="currencyBtn"
                             style="background:rgba(197,160,40,0.1); border:1px solid rgba(197,160,40,0.3); color:#F0D060; font-family:inherit; font-size:0.8rem; font-weight:700; cursor:pointer; padding:0.35rem 0.7rem; border-radius:20px; display:flex; align-items:center; gap:0.35rem; transition:all 0.2s;"
                             onmouseover="this.style.background='rgba(197,160,40,0.2)'"
-                            onmouseout="this.style.background='rgba(197,160,40,0.1)'">
-                        <i class="fa-solid fa-coins fa-xs"></i>
+                            onmouseout="this.style.background='rgba(197,160,40,0.1)'"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                            aria-controls="currencyMenu"
+                            aria-label="{{ app()->getLocale() === 'ar' ? 'اختيار العملة' : 'Select currency' }}">
+                        <i class="fa-solid fa-coins fa-xs" aria-hidden="true"></i>
                         <span id="currencyBtnLabel">USD</span>
-                        <i class="fa-solid fa-chevron-down fa-xs" style="opacity:0.6; font-size:0.6rem;"></i>
+                        <i class="fa-solid fa-chevron-down fa-xs" style="opacity:0.6; font-size:0.6rem;" aria-hidden="true"></i>
                     </button>
-                    <div id="currencyMenu" style="display:none; position:absolute; top:calc(100% + 8px); inset-inline-end:0; background:#0D2035; border:1px solid rgba(197,160,40,0.25); border-radius:12px; padding:0.5rem; min-width:170px; z-index:999; box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+                    <div id="currencyMenu" role="listbox" aria-label="{{ app()->getLocale() === 'ar' ? 'العملات المتاحة' : 'Available currencies' }}" style="display:none; position:absolute; top:calc(100% + 8px); inset-inline-end:0; background:#0D2035; border:1px solid rgba(197,160,40,0.25); border-radius:12px; padding:0.5rem; min-width:170px; z-index:999; box-shadow:0 8px 32px rgba(0,0,0,0.4);">
                         @php
                         $currencies = [
                             'USD'=>['🇺🇸','USD','$'],
@@ -194,8 +203,12 @@
                 <a href="{{ route('survey.index') }}" class="btn-gold" style="font-size:0.9rem;" data-i18n="navCta">احجز رحلتك</a>
 
                 {{-- Mobile Menu Toggle --}}
-                <button id="mobileMenuBtn" style="display:none; background:none; border:none; color:#F0D060; cursor:pointer; padding:0.3rem; font-size:1.4rem;" class="mobile-only">
-                    <i class="fa-solid fa-bars"></i>
+                <button id="mobileMenuBtn"
+                        style="display:none; background:none; border:none; color:#F0D060; cursor:pointer; padding:0.3rem; font-size:1.4rem;" class="mobile-only"
+                        aria-label="{{ app()->getLocale() === 'ar' ? 'فتح القائمة' : 'Open menu' }}"
+                        aria-expanded="false"
+                        aria-controls="mobileMenu">
+                    <i class="fa-solid fa-bars" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
@@ -219,7 +232,7 @@
     </nav>
 
     {{-- ===================== PAGE CONTENT ===================== --}}
-    <main class="page-content">
+    <main class="page-content" id="main-content" tabindex="-1">
         @yield('content')
     </main>
 
@@ -244,21 +257,21 @@
                         نقدم لك أجمل الرحلات السياحية حول العالم بأجواء مصرية دافئة وخبرة تزيد على 10 سنوات.
                     </p>
                     {{-- Social Links --}}
-                    <div style="display:flex; gap:0.75rem; margin-top:1.25rem;">
-                        <a href="#" title="Facebook" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8A9BB5; text-decoration:none; transition:all 0.2s; font-size:1rem;" onmouseover="this.style.background='rgba(24,119,242,0.25)';this.style.color='#1877F2'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#8A9BB5'">
-                            <i class="fa-brands fa-facebook-f"></i>
+                    <div style="display:flex; gap:0.75rem; margin-top:1.25rem;" role="list" aria-label="{{ app()->getLocale() === 'ar' ? 'روابط التواصل الاجتماعي' : 'Social media links' }}">
+                        <a href="#" aria-label="Facebook" role="listitem" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8A9BB5; text-decoration:none; transition:all 0.2s; font-size:1rem;" onmouseover="this.style.background='rgba(24,119,242,0.25)';this.style.color='#1877F2'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#8A9BB5'">
+                            <i class="fa-brands fa-facebook-f" aria-hidden="true"></i>
                         </a>
-                        <a href="#" title="Instagram" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8A9BB5; text-decoration:none; transition:all 0.2s; font-size:1rem;" onmouseover="this.style.background='rgba(225,48,108,0.25)';this.style.color='#E1306C'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#8A9BB5'">
-                            <i class="fa-brands fa-instagram"></i>
+                        <a href="#" aria-label="Instagram" role="listitem" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8A9BB5; text-decoration:none; transition:all 0.2s; font-size:1rem;" onmouseover="this.style.background='rgba(225,48,108,0.25)';this.style.color='#E1306C'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#8A9BB5'">
+                            <i class="fa-brands fa-instagram" aria-hidden="true"></i>
                         </a>
-                        <a href="#" title="TikTok" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8A9BB5; text-decoration:none; transition:all 0.2s; font-size:1rem;" onmouseover="this.style.background='rgba(255,255,255,0.15)';this.style.color='#ffffff'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#8A9BB5'">
-                            <i class="fa-brands fa-tiktok"></i>
+                        <a href="#" aria-label="TikTok" role="listitem" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8A9BB5; text-decoration:none; transition:all 0.2s; font-size:1rem;" onmouseover="this.style.background='rgba(255,255,255,0.15)';this.style.color='#ffffff'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#8A9BB5'">
+                            <i class="fa-brands fa-tiktok" aria-hidden="true"></i>
                         </a>
-                        <a href="#" title="YouTube" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8A9BB5; text-decoration:none; transition:all 0.2s; font-size:1rem;" onmouseover="this.style.background='rgba(255,0,0,0.25)';this.style.color='#FF0000'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#8A9BB5'">
-                            <i class="fa-brands fa-youtube"></i>
+                        <a href="#" aria-label="YouTube" role="listitem" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8A9BB5; text-decoration:none; transition:all 0.2s; font-size:1rem;" onmouseover="this.style.background='rgba(255,0,0,0.25)';this.style.color='#FF0000'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#8A9BB5'">
+                            <i class="fa-brands fa-youtube" aria-hidden="true"></i>
                         </a>
-                        <a href="https://wa.me/201000000000" title="WhatsApp" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8A9BB5; text-decoration:none; transition:all 0.2s; font-size:1rem;" onmouseover="this.style.background='rgba(37,211,102,0.25)';this.style.color='#25D366'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#8A9BB5'">
-                            <i class="fa-brands fa-whatsapp"></i>
+                        <a href="https://wa.me/201000000000" aria-label="WhatsApp" role="listitem" style="width:36px; height:36px; background:rgba(255,255,255,0.08); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#8A9BB5; text-decoration:none; transition:all 0.2s; font-size:1rem;" onmouseover="this.style.background='rgba(37,211,102,0.25)';this.style.color='#25D366'" onmouseout="this.style.background='rgba(255,255,255,0.08)';this.style.color='#8A9BB5'">
+                            <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>
@@ -322,9 +335,10 @@
     {{-- ===================== WHATSAPP BUTTON ===================== --}}
     <a href="https://wa.me/201000000000?text={{ urlencode('مرحباً، أريد الاستفسار عن رحلة') }}"
        target="_blank"
+       rel="noopener noreferrer"
        class="whatsapp-float"
-       title="تواصل عبر واتساب">
-        <i class="fa-brands fa-whatsapp" style="font-size:2rem; line-height:1;"></i>
+       aria-label="{{ app()->getLocale() === 'ar' ? 'تواصل معنا عبر واتساب (يفتح في نافذة جديدة)' : 'Contact us on WhatsApp (opens in new window)' }}">
+        <i class="fa-brands fa-whatsapp" style="font-size:2rem; line-height:1;" aria-hidden="true"></i>
     </a>
 
     @stack('scripts')
@@ -343,6 +357,11 @@
         mobileBtn.addEventListener('click', () => {
             const isOpen = mobileMenu.style.display === 'block';
             mobileMenu.style.display = isOpen ? 'none' : 'block';
+            mobileBtn.setAttribute('aria-expanded', String(!isOpen));
+            const isAr = document.documentElement.lang === 'ar';
+            mobileBtn.setAttribute('aria-label', isOpen
+                ? (isAr ? 'فتح القائمة' : 'Open menu')
+                : (isAr ? 'إغلاق القائمة' : 'Close menu'));
         });
     }
 
@@ -387,7 +406,10 @@
 
     function toggleCurrencyMenu() {
         const menu = document.getElementById('currencyMenu');
-        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        const btn  = document.getElementById('currencyBtn');
+        const open = menu.style.display === 'none';
+        menu.style.display = open ? 'block' : 'none';
+        btn.setAttribute('aria-expanded', String(open));
     }
 
     function selectCurrency(code, symbol) {

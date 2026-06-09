@@ -45,6 +45,7 @@
                         @foreach($galleryItems as $media)
                         <div style="position:relative;">
                             <img src="{{ $media->getUrl() }}"
+                                 alt="{{ $destination->getTranslation('name', app()->getLocale()) }}"
                                  style="width:100%; height:90px; object-fit:cover; border-radius:6px; border:1px solid #E2E8F0;">
                             <label style="position:absolute; top:4px; inset-inline-end:4px; background:rgba(220,38,38,0.85); border-radius:4px; padding:2px 5px; cursor:pointer; display:flex; align-items:center; gap:3px; font-size:0.65rem; color:#fff;">
                                 <input type="checkbox" name="gallery_delete[]" value="{{ $media->id }}" style="display:none;">
@@ -153,12 +154,13 @@
                     @php $destImage = $destination->getFirstMedia('image'); @endphp
                     @if($destImage)
                         <img src="{{ $destImage->getUrl() }}"
+                             alt="{{ $destination->getTranslation('name', app()->getLocale()) }}"
                              style="width:100%; border-radius:8px; margin-bottom:0.75rem; max-height:160px; object-fit:cover; border:1px solid #E2E8F0;">
                     @endif
                     <input type="file" name="image" class="admin-input" accept="image/*" style="padding:0.4rem;" id="destImageInput" onchange="previewDestImage(this)">
                     <p style="font-size:0.75rem; color:#94A3B8; margin-top:0.4rem;">JPG, PNG, WebP — max 2MB</p>
                     <div id="destImagePreview" style="display:none; margin-top:0.75rem;">
-                        <img id="destImagePreviewImg" src="" style="width:100%; border-radius:8px; max-height:160px; object-fit:cover; border:1px solid #E2E8F0;">
+                        <img id="destImagePreviewImg" src="" alt="" style="width:100%; border-radius:8px; max-height:160px; object-fit:cover; border:1px solid #E2E8F0;">
                     </div>
                 </div>
             </div>

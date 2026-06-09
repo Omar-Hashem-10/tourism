@@ -91,7 +91,7 @@
                             <input type="file" name="highlight_images[0]" class="admin-input" accept="image/*"
                                    style="padding:0.3rem; font-size:0.75rem;" onchange="previewHl(this)">
                             <div class="hl-preview" style="margin-top:0.3rem; display:none;">
-                                <img src="" style="height:32px; border-radius:4px; border:1px solid #E2E8F0;">
+                                <img src="" alt="" style="height:32px; border-radius:4px; border:1px solid #E2E8F0;">
                             </div>
                         </div>
                         <button type="button" class="admin-btn admin-btn-danger admin-btn-sm remove-highlight" title="{{ __('admin.delete') }}" style="padding:0.3rem; margin-top:2px;">
@@ -372,7 +372,7 @@ function previewGallery(input) {
         reader.onload = e => {
             const wrap = document.createElement('div');
             wrap.style.cssText = 'position:relative; width:80px; height:80px;';
-            wrap.innerHTML = `<img src="${e.target.result}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #E2E8F0;">`;
+            wrap.innerHTML = `<img src="${e.target.result}" alt="" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #E2E8F0;">`;
             preview.appendChild(wrap);
         };
         reader.readAsDataURL(file);
@@ -400,7 +400,7 @@ document.getElementById('add-highlight').addEventListener('click', function() {
             <input type="file" name="highlight_images[${idx}]" class="admin-input" accept="image/*"
                    style="padding:0.3rem; font-size:0.75rem;" onchange="previewHl(this)">
             <div class="hl-preview" style="margin-top:0.3rem; display:none;">
-                <img src="" style="height:32px; border-radius:4px; border:1px solid #E2E8F0;">
+                <img src="" alt="" style="height:32px; border-radius:4px; border:1px solid #E2E8F0;">
             </div>
         </div>
         <button type="button" class="admin-btn admin-btn-danger admin-btn-sm remove-highlight" style="padding:0.3rem; margin-top:2px;">

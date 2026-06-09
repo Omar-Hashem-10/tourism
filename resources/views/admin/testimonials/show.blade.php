@@ -38,6 +38,7 @@
                     @php $av = $testimonial->getFirstMedia('avatar'); @endphp
                     @if($av)
                         <img src="{{ $av->getUrl() }}"
+                             alt="{{ $testimonial->name }}"
                              style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:2px solid #E2E8F0; flex-shrink:0;">
                     @else
                         <div style="width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#C5A028,#F0D060); display:flex; align-items:center; justify-content:center; font-weight:800; color:#1A1A1A; font-size:1.4rem; flex-shrink:0;">

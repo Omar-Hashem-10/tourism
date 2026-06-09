@@ -30,12 +30,12 @@
     <div class="survey-wrapper" style="position:relative; z-index:1;">
 
         {{-- Header with progress --}}
-        <div class="survey-header">
+        <div class="survey-header" aria-live="polite" aria-atomic="true">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
-                <span style="font-size:0.85rem; opacity:0.7;" id="stepLabel" data-i18n-template="stepOf" data-step="1">خطوة 1 من 4</span>
-                <span style="font-size:0.85rem; opacity:0.7;" id="stepPercent">25%</span>
+                <span style="font-size:0.85rem; opacity:0.7;" id="stepLabel" data-i18n-template="stepOf" data-step="1" aria-live="polite">خطوة 1 من 4</span>
+                <span style="font-size:0.85rem; opacity:0.7;" id="stepPercent" aria-hidden="true">25%</span>
             </div>
-            <div class="survey-progress-bar">
+            <div class="survey-progress-bar" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" aria-labelledby="stepLabel">
                 <div class="survey-progress-fill" id="progressFill" style="width:25%;"></div>
             </div>
         </div>
@@ -71,29 +71,29 @@
 
             {{-- ── STEP 2: Travel Type ── --}}
             <div class="survey-step" id="step2">
-                <h2 style="font-size:1.2rem; font-weight:800; color:#1A3A5C; margin-bottom:0.3rem;" data-i18n="step2Title">ثانياً — نوع رحلتك</h2>
+                <h2 style="font-size:1.2rem; font-weight:800; color:#1A3A5C; margin-bottom:0.3rem;" id="step2Title" data-i18n="step2Title">ثانياً — نوع رحلتك</h2>
                 <p style="color:#888; font-size:0.9rem; margin-bottom:1.5rem;" data-i18n="step2Sub">مع من ستسافر؟</p>
 
-                <div class="survey-option-grid">
-                    <div class="survey-option" data-field="travel_type" data-value="family">
-                        <span class="option-icon">👨‍👩‍👧‍👦</span>
+                <div class="survey-option-grid" role="group" aria-labelledby="step2Title">
+                    <div class="survey-option" role="button" tabindex="0" aria-pressed="false" data-field="travel_type" data-value="family">
+                        <span class="option-icon" aria-hidden="true">👨‍👩‍👧‍👦</span>
                         <span class="option-label" data-i18n="optFamily">مع العائلة</span>
                     </div>
-                    <div class="survey-option" data-field="travel_type" data-value="couple">
-                        <span class="option-icon">👫</span>
+                    <div class="survey-option" role="button" tabindex="0" aria-pressed="false" data-field="travel_type" data-value="couple">
+                        <span class="option-icon" aria-hidden="true">👫</span>
                         <span class="option-label" data-i18n="optCouple">مع الشريك</span>
                     </div>
-                    <div class="survey-option" data-field="travel_type" data-value="solo">
-                        <span class="option-icon">🧍</span>
+                    <div class="survey-option" role="button" tabindex="0" aria-pressed="false" data-field="travel_type" data-value="solo">
+                        <span class="option-icon" aria-hidden="true">🧍</span>
                         <span class="option-label" data-i18n="optSolo">منفرداً</span>
                     </div>
-                    <div class="survey-option" data-field="travel_type" data-value="friends">
-                        <span class="option-icon">👯</span>
+                    <div class="survey-option" role="button" tabindex="0" aria-pressed="false" data-field="travel_type" data-value="friends">
+                        <span class="option-icon" aria-hidden="true">👯</span>
                         <span class="option-label" data-i18n="optFriends">مع الأصدقاء</span>
                     </div>
                 </div>
                 <input type="hidden" name="travel_type" id="travel_type_input" required>
-                <div class="field-error" id="travelTypeError" style="color:#CE1126; font-size:0.82rem; margin-top:0.75rem; display:none;"></div>
+                <div class="field-error" id="travelTypeError" role="alert" style="color:#CE1126; font-size:0.82rem; margin-top:0.75rem; display:none;"></div>
             </div>
 
             {{-- ── STEP 3: Preferences ── --}}
@@ -117,27 +117,27 @@
 
                 {{-- Climate --}}
                 <div style="margin-bottom:1.5rem;">
-                    <label class="survey-label" data-i18n="labelClimate">المناخ المفضل</label>
-                    <div class="survey-option-grid">
-                        <div class="survey-option" data-field="preferred_climate" data-value="beach">
-                            <span class="option-icon">🏖</span>
+                    <p class="survey-label" id="climateLabel" data-i18n="labelClimate">المناخ المفضل</p>
+                    <div class="survey-option-grid" role="group" aria-labelledby="climateLabel">
+                        <div class="survey-option" role="button" tabindex="0" aria-pressed="false" data-field="preferred_climate" data-value="beach">
+                            <span class="option-icon" aria-hidden="true">🏖</span>
                             <span class="option-label" data-i18n="optCliBeach">شاطئ وبحر</span>
                         </div>
-                        <div class="survey-option" data-field="preferred_climate" data-value="desert">
-                            <span class="option-icon">🏜</span>
+                        <div class="survey-option" role="button" tabindex="0" aria-pressed="false" data-field="preferred_climate" data-value="desert">
+                            <span class="option-icon" aria-hidden="true">🏜</span>
                             <span class="option-label" data-i18n="optCliDesert">صحراء وتاريخ</span>
                         </div>
-                        <div class="survey-option" data-field="preferred_climate" data-value="mountain">
-                            <span class="option-icon">🏔</span>
+                        <div class="survey-option" role="button" tabindex="0" aria-pressed="false" data-field="preferred_climate" data-value="mountain">
+                            <span class="option-icon" aria-hidden="true">🏔</span>
                             <span class="option-label" data-i18n="optCliMountain">جبال وطبيعة</span>
                         </div>
-                        <div class="survey-option" data-field="preferred_climate" data-value="city">
-                            <span class="option-icon">🏙</span>
+                        <div class="survey-option" role="button" tabindex="0" aria-pressed="false" data-field="preferred_climate" data-value="city">
+                            <span class="option-icon" aria-hidden="true">🏙</span>
                             <span class="option-label" data-i18n="optCliCity">مدن ومعالم</span>
                         </div>
                     </div>
                     <input type="hidden" name="preferred_climate" id="climate_input" required>
-                    <div class="field-error" id="climateError" style="color:#CE1126; font-size:0.82rem; margin-top:0.75rem; display:none;"></div>
+                    <div class="field-error" id="climateError" role="alert" style="color:#CE1126; font-size:0.82rem; margin-top:0.75rem; display:none;"></div>
                 </div>
 
                 {{-- Duration --}}
@@ -210,6 +210,8 @@ function updateProgress() {
     const pct = Math.round((currentStep / totalSteps) * 100);
     progressFill.style.width = pct + '%';
     stepPercent.textContent = pct + '%';
+    const progressBar = document.querySelector('.survey-progress-bar');
+    if (progressBar) progressBar.setAttribute('aria-valuenow', pct);
     const t = (window.TEXTS || {})[lang] || (window.TEXTS || {})['ar'] || {};
     stepLabel.textContent = (t.stepOf || 'خطوة %s من 4').replace('%s', currentStep);
     btnBack.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
@@ -232,26 +234,36 @@ function showStep(n) {
     updateProgress();
 }
 
+// ── Option card select handler
+function selectOption(opt) {
+    const field = opt.dataset.field;
+    const val   = opt.dataset.value;
+    answers[field] = val;
+
+    // Update hidden input
+    const input = document.getElementById(
+        field === 'travel_type' ? 'travel_type_input' : 'climate_input'
+    );
+    if (input) input.value = val;
+
+    // Update UI + aria-pressed
+    document.querySelectorAll(`.survey-option[data-field="${field}"]`)
+        .forEach(o => { o.classList.remove('selected'); o.setAttribute('aria-pressed', 'false'); });
+    opt.classList.add('selected');
+    opt.setAttribute('aria-pressed', 'true');
+
+    // Clear error
+    clearError(field === 'travel_type' ? 'travelTypeError' : 'climateError');
+}
+
 // ── Option card clicks (travel_type, preferred_climate)
 document.querySelectorAll('.survey-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-        const field = opt.dataset.field;
-        const val   = opt.dataset.value;
-        answers[field] = val;
-
-        // Update hidden input
-        const input = document.getElementById(
-            field === 'travel_type' ? 'travel_type_input' : 'climate_input'
-        );
-        if (input) input.value = val;
-
-        // Update UI
-        document.querySelectorAll(`.survey-option[data-field="${field}"]`)
-            .forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-
-        // Clear error
-        clearError(field === 'travel_type' ? 'travelTypeError' : 'climateError');
+    opt.addEventListener('click', () => selectOption(opt));
+    opt.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectOption(opt);
+        }
     });
 });
 

@@ -26,11 +26,11 @@
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th style="width:50px;">#</th>
-                    <th>{{ __('admin.email') }}</th>
-                    <th>{{ __('admin.subscription_date') }}</th>
-                    <th>{{ __('admin.status') }}</th>
-                    <th>{{ __('admin.actions') }}</th>
+                    <th scope="col" style="width:50px;">#</th>
+                    <th scope="col">{{ __('admin.email') }}</th>
+                    <th scope="col">{{ __('admin.subscription_date') }}</th>
+                    <th scope="col">{{ __('admin.status') }}</th>
+                    <th scope="col">{{ __('admin.actions') }}</th>
                 </tr>
             </thead>
             <tbody>

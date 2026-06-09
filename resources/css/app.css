@@ -863,3 +863,71 @@ body {
     letter-spacing: 0.3rem;
     opacity: 0.6;
 }
+
+/* ========================
+   Accessibility
+   ======================== */
+
+/* Skip to main content link */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    inset-inline-start: 0;
+    background: #1A3A5C;
+    color: #F0D060;
+    font-weight: 700;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0 0 6px 0;
+    z-index: 10000;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: top 0.2s ease;
+}
+.skip-link:focus { top: 0; }
+
+/* Focus-visible: visible keyboard focus on all interactive elements */
+:focus-visible {
+    outline: 3px solid #C5A028;
+    outline-offset: 3px;
+}
+
+/* Override outline:none with focus-visible for survey inputs */
+.survey-input:focus-visible {
+    outline: 3px solid #C5A028;
+    outline-offset: 2px;
+    border-color: #C5A028;
+}
+
+/* Survey options keyboard focus */
+.survey-option:focus-visible {
+    outline: 3px solid #C5A028;
+    outline-offset: 3px;
+    border-color: #C5A028;
+}
+
+/* Newsletter input focus */
+.newsletter-input:focus-visible {
+    outline: 3px solid #C5A028;
+    outline-offset: 2px;
+}
+
+/* Nav links focus */
+.nav-link:focus-visible,
+.footer-link:focus-visible {
+    outline: 3px solid #C5A028;
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* Buttons focus */
+.btn-gold:focus-visible,
+.lang-btn:focus-visible {
+    outline: 3px solid #F0D060;
+    outline-offset: 3px;
+}
+
+/* WhatsApp float focus */
+.whatsapp-float:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 4px;
+}

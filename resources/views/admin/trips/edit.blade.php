@@ -98,12 +98,13 @@
                         <div>
                             @if(!empty($hlImgs[$i]))
                                 <img src="{{ asset('storage/' . $hlImgs[$i]) }}"
+                                     alt=""
                                      style="height:28px; border-radius:4px; margin-bottom:0.3rem; border:1px solid #E2E8F0;">
                             @endif
                             <input type="file" name="highlight_images[{{ $i }}]" class="admin-input" accept="image/*"
                                    style="padding:0.3rem; font-size:0.75rem;" onchange="previewHl(this)">
                             <div class="hl-preview" style="margin-top:0.3rem; display:none;">
-                                <img src="" style="height:32px; border-radius:4px; border:1px solid #E2E8F0;">
+                                <img src="" alt="" style="height:32px; border-radius:4px; border:1px solid #E2E8F0;">
                             </div>
                         </div>
                         <button type="button" class="admin-btn admin-btn-danger admin-btn-sm remove-highlight" style="padding:0.3rem; margin-top:2px;">
@@ -209,7 +210,7 @@
                     <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1rem;" id="existingGallery">
                         @foreach($galleryMedia as $media)
                         <div style="position:relative; width:80px; height:80px;" class="gallery-thumb">
-                            <img src="{{ $media->getUrl() }}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #E2E8F0;">
+                            <img src="{{ $media->getUrl() }}" alt="{{ $trip->getTranslation('title', app()->getLocale()) }}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #E2E8F0;">
                             <label style="position:absolute; top:3px; inset-inline-end:3px; background:rgba(220,38,38,0.85); border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
                                 <input type="checkbox" name="gallery_delete[]" value="{{ $media->id }}" style="display:none;" onchange="this.closest('.gallery-thumb').style.opacity=this.checked?'0.35':'1'">
                                 <i class="fa-solid fa-xmark" style="color:white; font-size:0.65rem; pointer-events:none;"></i>
@@ -348,6 +349,7 @@
                     @php $tripImage = $trip->getFirstMedia('image'); @endphp
                     @if($tripImage)
                         <img src="{{ $tripImage->getUrl() }}"
+                             alt="{{ $trip->getTranslation('title', app()->getLocale()) }}"
                              style="width:100%; border-radius:8px; margin-bottom:0.75rem; max-height:160px; object-fit:cover;">
                     @endif
                     <input type="file" name="image" class="admin-input" accept="image/*" style="padding:0.4rem;">
@@ -421,7 +423,7 @@ function previewGallery(input) {
         reader.onload = e => {
             const wrap = document.createElement('div');
             wrap.style.cssText = 'position:relative; width:80px; height:80px;';
-            wrap.innerHTML = `<img src="${e.target.result}" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #E2E8F0;">`;
+            wrap.innerHTML = `<img src="${e.target.result}" alt="" style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #E2E8F0;">`;
             preview.appendChild(wrap);
         };
         reader.readAsDataURL(file);
@@ -449,7 +451,7 @@ document.getElementById('add-highlight').addEventListener('click', function() {
             <input type="file" name="highlight_images[${idx}]" class="admin-input" accept="image/*"
                    style="padding:0.3rem; font-size:0.75rem;" onchange="previewHl(this)">
             <div class="hl-preview" style="margin-top:0.3rem; display:none;">
-                <img src="" style="height:32px; border-radius:4px; border:1px solid #E2E8F0;">
+                <img src="" alt="" style="height:32px; border-radius:4px; border:1px solid #E2E8F0;">
             </div>
         </div>
         <button type="button" class="admin-btn admin-btn-danger admin-btn-sm remove-highlight" style="padding:0.3rem; margin-top:2px;">

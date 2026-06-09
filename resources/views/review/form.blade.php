@@ -28,7 +28,7 @@
         <div style="background:#fff; border-radius:20px; box-shadow:0 8px 40px rgba(0,0,0,0.08); padding:2rem;">
 
             @if($errors->any())
-            <div style="background:#FEF2F2; border:1px solid #FCA5A5; border-radius:10px; padding:0.85rem 1rem; margin-bottom:1.25rem; color:#B91C1C; font-size:0.875rem;">
+            <div role="alert" aria-live="assertive" style="background:#FEF2F2; border:1px solid #FCA5A5; border-radius:10px; padding:0.85rem 1rem; margin-bottom:1.25rem; color:#B91C1C; font-size:0.875rem;">
                 {{ $errors->first() }}
             </div>
             @endif
@@ -62,7 +62,7 @@
                         @endfor
                     </div>
                     @error('rating')
-                    <p style="color:#EF4444; font-size:0.78rem; margin-top:0.3rem;">{{ $message }}</p>
+                    <p id="rating-error" role="alert" style="color:#EF4444; font-size:0.78rem; margin-top:0.3rem;">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -71,13 +71,14 @@
                     <label style="display:block; font-size:0.875rem; font-weight:700; color:#1A3A5C; margin-bottom:0.5rem;">
                         {{ $isAr ? 'اكتب رأيك' : 'Write Your Review' }} <span style="color:#EF4444;">*</span>
                     </label>
-                    <textarea name="review" rows="5"
+                    <textarea name="review" id="review-text" rows="5"
                               placeholder="{{ $isAr ? 'شاركنا تجربتك... ما اللي عجبك؟ وما اللي ممكن يتحسن؟' : 'Tell us about your experience... What did you love? What could be better?' }}"
                               style="width:100%; border:1px solid #E2E8F0; border-radius:10px; padding:0.85rem 1rem; font-size:0.9rem; font-family:inherit; resize:vertical; outline:none; direction:{{ $isAr ? 'rtl' : 'ltr' }}; box-sizing:border-box; transition:border-color 0.2s;"
                               onfocus="this.style.borderColor='#C5A028'"
-                              onblur="this.style.borderColor='#E2E8F0'">{{ old('review') }}</textarea>
+                              onblur="this.style.borderColor='#E2E8F0'"
+                              aria-describedby="review-error" @error('review') aria-invalid="true" @enderror>{{ old('review') }}</textarea>
                     @error('review')
-                    <p style="color:#EF4444; font-size:0.78rem; margin-top:0.3rem;">{{ $message }}</p>
+                    <p id="review-error" role="alert" style="color:#EF4444; font-size:0.78rem; margin-top:0.3rem;">{{ $message }}</p>
                     @enderror
                 </div>
 

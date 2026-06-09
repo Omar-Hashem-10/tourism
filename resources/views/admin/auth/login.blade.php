@@ -21,8 +21,8 @@
 
         {{-- Validation errors --}}
         @if($errors->any())
-            <div class="admin-flash admin-flash-error" style="margin-bottom:1.25rem;">
-                <i class="fa-solid fa-circle-xmark"></i>
+            <div class="admin-flash admin-flash-error" role="alert" aria-live="assertive" style="margin-bottom:1.25rem;">
+                <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
                 {{ $errors->first() }}
             </div>
         @endif
@@ -40,7 +40,8 @@
                        class="admin-input"
                        value="{{ old('email') }}"
                        placeholder="admin@example.com"
-                       required autofocus>
+                       required autofocus
+                       @error('email') aria-invalid="true" @enderror>
             </div>
 
             <div class="admin-form-group">
@@ -51,7 +52,8 @@
                 <input id="password" type="password" name="password"
                        class="admin-input"
                        placeholder="••••••••"
-                       required>
+                       required
+                       @error('password') aria-invalid="true" @enderror>
             </div>
 
             <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1.5rem;">

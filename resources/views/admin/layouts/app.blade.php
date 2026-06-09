@@ -12,6 +12,10 @@
 </head>
 <body class="admin-body">
 
+    <a href="#admin-main-content" class="skip-link">
+        {{ app()->getLocale() === 'ar' ? 'تخطى للمحتوى الرئيسي' : 'Skip to main content' }}
+    </a>
+
     {{-- ── Sidebar ─────────────────────────────────────────────── --}}
     <aside class="admin-sidebar">
         {{-- Logo --}}
@@ -24,62 +28,62 @@
         </div>
 
         {{-- Nav --}}
-        <nav style="flex:1; padding: 0.75rem 0;">
+        <nav style="flex:1; padding: 0.75rem 0;" aria-label="{{ app()->getLocale() === 'ar' ? 'قائمة لوحة التحكم' : 'Admin navigation' }}" role="navigation">
             <div class="admin-nav-section">{{ __('admin.nav_main') }}</div>
             <a href="{{ route('admin.dashboard') }}"
                class="admin-nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <i class="fa-solid fa-chart-line"></i>
+                <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
                 {{ __('admin.nav_dashboard') }}
             </a>
 
             <div class="admin-nav-section">{{ __('admin.nav_content') }}</div>
             <a href="{{ route('admin.trips.index') }}"
                class="admin-nav-link {{ request()->routeIs('admin.trips.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-plane-departure"></i>
+                <i class="fa-solid fa-plane-departure" aria-hidden="true"></i>
                 {{ __('admin.nav_trips') }}
             </a>
             <a href="{{ route('admin.destinations.index') }}"
                class="admin-nav-link {{ request()->routeIs('admin.destinations.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-map-location-dot"></i>
+                <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
                 {{ __('admin.nav_destinations') }}
             </a>
             <a href="{{ route('admin.countries.index') }}"
                class="admin-nav-link {{ request()->routeIs('admin.countries.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-flag"></i>
+                <i class="fa-solid fa-flag" aria-hidden="true"></i>
                 {{ __('admin.nav_countries') }}
             </a>
             <a href="{{ route('admin.testimonials.index') }}"
                class="admin-nav-link {{ request()->routeIs('admin.testimonials.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star" aria-hidden="true"></i>
                 {{ __('admin.nav_testimonials') }}
             </a>
 
             <div class="admin-nav-section">{{ __('admin.nav_sales') }}</div>
             <a href="{{ route('admin.bookings.index') }}"
                class="admin-nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-calendar-check"></i>
+                <i class="fa-solid fa-calendar-check" aria-hidden="true"></i>
                 {{ __('admin.nav_bookings') }}
             </a>
             <a href="{{ route('admin.surveys.index') }}"
                class="admin-nav-link {{ request()->routeIs('admin.surveys.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-clipboard-list"></i>
+                <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
                 {{ __('admin.nav_surveys') }}
             </a>
             <a href="{{ route('admin.subscribers.index') }}"
                class="admin-nav-link {{ request()->routeIs('admin.subscribers.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-envelope"></i>
+                <i class="fa-solid fa-envelope" aria-hidden="true"></i>
                 {{ __('admin.nav_subscribers') }}
             </a>
 
             <div class="admin-nav-section">{{ __('admin.nav_settings_sec') }}</div>
             <a href="{{ route('admin.settings.index') }}"
                class="admin-nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
-                <i class="fa-solid fa-gear"></i>
+                <i class="fa-solid fa-gear" aria-hidden="true"></i>
                 {{ __('admin.nav_settings') }}
             </a>
             <a href="{{ route('home') }}" target="_blank"
                class="admin-nav-link">
-                <i class="fa-solid fa-globe"></i>
+                <i class="fa-solid fa-globe" aria-hidden="true"></i>
                 {{ __('admin.nav_view_site') }}
             </a>
         </nav>
@@ -127,10 +131,14 @@
                     <button onclick="adminToggleCurrencyMenu()" id="adminCurrencyBtn"
                             style="background:rgba(197,160,40,0.12); border:1px solid rgba(197,160,40,0.35); color:#C5A028; font-family:Cairo,sans-serif; font-size:0.78rem; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:0.35rem; padding:0.3rem 0.75rem; border-radius:20px; transition:all 0.2s;"
                             onmouseover="this.style.background='rgba(197,160,40,0.22)'"
-                            onmouseout="this.style.background='rgba(197,160,40,0.12)'">
-                        <i class="fa-solid fa-coins fa-xs"></i>
+                            onmouseout="this.style.background='rgba(197,160,40,0.12)'"
+                            aria-haspopup="listbox"
+                            aria-expanded="false"
+                            aria-controls="adminCurrencyMenu"
+                            aria-label="{{ app()->getLocale() === 'ar' ? 'اختيار العملة' : 'Select currency' }}">
+                        <i class="fa-solid fa-coins fa-xs" aria-hidden="true"></i>
                         <span id="adminCurrencyBtnLabel">USD</span>
-                        <i class="fa-solid fa-chevron-down fa-xs" style="opacity:0.6; font-size:0.6rem;"></i>
+                        <i class="fa-solid fa-chevron-down fa-xs" style="opacity:0.6; font-size:0.6rem;" aria-hidden="true"></i>
                     </button>
                     <div id="adminCurrencyMenu" style="display:none; position:absolute; top:calc(100% + 8px); inset-inline-end:0; background:#0D2035; border:1px solid rgba(197,160,40,0.25); border-radius:12px; padding:0.5rem; min-width:170px; z-index:9999; box-shadow:0 8px 32px rgba(0,0,0,0.5);">
                         @php
@@ -177,17 +185,17 @@
         </header>
 
         {{-- Content --}}
-        <main class="admin-content">
+        <main class="admin-content" id="admin-main-content" tabindex="-1">
             {{-- Flash messages --}}
             @if(session('success'))
-                <div class="admin-flash admin-flash-success">
-                    <i class="fa-solid fa-circle-check"></i>
+                <div class="admin-flash admin-flash-success" role="status" aria-live="polite">
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
                     {{ session('success') }}
                 </div>
             @endif
             @if(session('error'))
-                <div class="admin-flash admin-flash-error">
-                    <i class="fa-solid fa-circle-xmark"></i>
+                <div class="admin-flash admin-flash-error" role="alert" aria-live="assertive">
+                    <i class="fa-solid fa-circle-xmark" aria-hidden="true"></i>
                     {{ session('error') }}
                 </div>
             @endif
@@ -217,7 +225,10 @@
 
     function adminToggleCurrencyMenu() {
         const menu = document.getElementById('adminCurrencyMenu');
-        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        const btn  = document.getElementById('adminCurrencyBtn');
+        const open = menu.style.display === 'none';
+        menu.style.display = open ? 'block' : 'none';
+        btn.setAttribute('aria-expanded', String(open));
     }
 
     function adminSelectCurrency(code) {

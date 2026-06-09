@@ -130,6 +130,7 @@ $currentCategory = request('category', '');
                     <div style="display:flex; gap:4px; margin-bottom:0.75rem; overflow:hidden; border-radius:6px;">
                         @foreach($gallery->take(3) as $gm)
                         <img src="{{ $gm->getUrl() }}"
+                             alt="{{ $name }}"
                              style="width:{{ $gallery->count() >= 3 ? '33.3%' : '50%' }}; height:48px; object-fit:cover; flex-shrink:0;">
                         @endforeach
                         @if($gallery->count() > 3)

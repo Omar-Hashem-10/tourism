@@ -137,7 +137,7 @@
                     <input type="file" name="image" class="admin-input" accept="image/*" style="padding:0.4rem;" id="destImageInput" onchange="previewDestImage(this)">
                     <p style="font-size:0.75rem; color:#94A3B8; margin-top:0.4rem;">JPG, PNG, WebP — max 2MB</p>
                     <div id="destImagePreview" style="display:none; margin-top:0.75rem;">
-                        <img id="destImagePreviewImg" src="" style="width:100%; border-radius:8px; max-height:160px; object-fit:cover; border:1px solid #E2E8F0;">
+                        <img id="destImagePreviewImg" src="" alt="" style="width:100%; border-radius:8px; max-height:160px; object-fit:cover; border:1px solid #E2E8F0;">
                     </div>
                 </div>
             </div>

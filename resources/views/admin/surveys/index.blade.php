@@ -35,15 +35,15 @@
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>{{ __('admin.name') }}</th>
-                    <th>{{ __('admin.email') }}</th>
-                    <th>{{ __('admin.travel_type_col') }}</th>
-                    <th>{{ __('admin.budget') }}</th>
-                    <th>{{ __('admin.climate_col') }}</th>
-                    <th>{{ __('admin.duration_col') }}</th>
-                    <th>{{ __('admin.date_col') }}</th>
-                    <th></th>
+                    <th scope="col">#</th>
+                    <th scope="col">{{ __('admin.name') }}</th>
+                    <th scope="col">{{ __('admin.email') }}</th>
+                    <th scope="col">{{ __('admin.travel_type_col') }}</th>
+                    <th scope="col">{{ __('admin.budget') }}</th>
+                    <th scope="col">{{ __('admin.climate_col') }}</th>
+                    <th scope="col">{{ __('admin.duration_col') }}</th>
+                    <th scope="col">{{ __('admin.date_col') }}</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>

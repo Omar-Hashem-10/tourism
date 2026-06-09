@@ -152,19 +152,22 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label"><span data-i18n="bookLabelName">الاسم الكامل</span> <span>*</span></label>
-                            <input type="text" name="name" class="form-control" placeholder="مثلاً: أحمد محمد" value="{{ old('name') }}" required>
-                            @error('name')<div class="field-error">{{ $message }}</div>@enderror
+                            <input type="text" name="name" id="booking-name" class="form-control" placeholder="مثلاً: أحمد محمد" value="{{ old('name') }}" required
+                                   aria-describedby="booking-name-error" @error('name') aria-invalid="true" @enderror>
+                            @error('name')<div id="booking-name-error" class="field-error" role="alert">{{ $message }}</div>@enderror
                         </div>
                         <div class="form-group">
                             <label class="form-label"><span data-i18n="bookLabelPhone">رقم الهاتف</span> <span>*</span></label>
-                            <input type="tel" name="phone" class="form-control" placeholder="+20 1XX XXX XXXX" value="{{ old('phone') }}" required>
-                            @error('phone')<div class="field-error">{{ $message }}</div>@enderror
+                            <input type="tel" name="phone" id="booking-phone" class="form-control" placeholder="+20 1XX XXX XXXX" value="{{ old('phone') }}" required
+                                   aria-describedby="booking-phone-error" @error('phone') aria-invalid="true" @enderror>
+                            @error('phone')<div id="booking-phone-error" class="field-error" role="alert">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label"><span data-i18n="bookLabelEmail">البريد الإلكتروني</span> <span>*</span></label>
-                        <input type="email" name="email" class="form-control" placeholder="example@email.com" value="{{ old('email') }}" required>
-                        @error('email')<div class="field-error">{{ $message }}</div>@enderror
+                        <input type="email" name="email" id="booking-email" class="form-control" placeholder="example@email.com" value="{{ old('email') }}" required
+                               aria-describedby="booking-email-error" @error('email') aria-invalid="true" @enderror>
+                        @error('email')<div id="booking-email-error" class="field-error" role="alert">{{ $message }}</div>@enderror
                     </div>
                     {{-- Travelers: Adults + Children --}}
                     <div class="form-group">
@@ -267,8 +270,9 @@
                             @endforeach
                         </div>
                         <input type="hidden" name="travel_date" id="travelDateInput"
-                            value="{{ old('travel_date', $departureDates[0] ?? '') }}" required>
-                        @error('travel_date')<div class="field-error">{{ $message }}</div>@enderror
+                            value="{{ old('travel_date', $departureDates[0] ?? '') }}" required
+                            aria-describedby="travel-date-error" @error('travel_date') aria-invalid="true" @enderror>
+                        @error('travel_date')<div id="travel-date-error" class="field-error" role="alert">{{ $message }}</div>@enderror
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-i18n="bookLabelNotes">ملاحظات إضافية</label>

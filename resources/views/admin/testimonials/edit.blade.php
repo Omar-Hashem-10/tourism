@@ -53,13 +53,13 @@
                         @php $avatarMedia = $testimonial->getFirstMedia('avatar'); @endphp
                         @if($avatarMedia)
                             <div style="margin-bottom:0.5rem;">
-                                <img src="{{ $avatarMedia->getUrl() }}" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:2px solid #E2E8F0;">
+                                <img src="{{ $avatarMedia->getUrl() }}" alt="{{ $testimonial->name }}" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:2px solid #E2E8F0;">
                             </div>
                         @endif
                         <input type="file" name="avatar" class="admin-input" accept="image/*" style="padding:0.4rem;"
                                onchange="previewAvatar(this)">
                         <div id="avatarPreview" style="display:none; margin-top:0.5rem;">
-                            <img id="avatarPreviewImg" src="" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:2px solid #E2E8F0;">
+                            <img id="avatarPreviewImg" src="" alt="" style="width:60px; height:60px; border-radius:50%; object-fit:cover; border:2px solid #E2E8F0;">
                         </div>
                     </div>
                 </div>

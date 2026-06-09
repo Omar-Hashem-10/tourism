@@ -32,15 +32,15 @@
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>{{ __('admin.booking_reference') }}</th>
-                    <th>{{ __('admin.booking_customer') }}</th>
-                    <th>{{ __('admin.booking_trip') }}</th>
-                    <th>{{ __('admin.booking_date') }}</th>
-                    <th>{{ __('admin.travel_date') }}</th>
-                    <th>{{ __('admin.booking_amount') }}</th>
-                    <th>{{ __('admin.booking_payment') }}</th>
-                    <th>{{ __('admin.status') }}</th>
-                    <th>{{ __('admin.actions') }}</th>
+                    <th scope="col">{{ __('admin.booking_reference') }}</th>
+                    <th scope="col">{{ __('admin.booking_customer') }}</th>
+                    <th scope="col">{{ __('admin.booking_trip') }}</th>
+                    <th scope="col">{{ __('admin.booking_date') }}</th>
+                    <th scope="col">{{ __('admin.travel_date') }}</th>
+                    <th scope="col">{{ __('admin.booking_amount') }}</th>
+                    <th scope="col">{{ __('admin.booking_payment') }}</th>
+                    <th scope="col">{{ __('admin.status') }}</th>
+                    <th scope="col">{{ __('admin.actions') }}</th>
                 </tr>
             </thead>
             <tbody>

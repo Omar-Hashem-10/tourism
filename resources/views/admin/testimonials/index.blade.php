@@ -15,11 +15,11 @@
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>{{ __('admin.booking_customer') }}</th>
-                    <th>{{ __('admin.testimonial_review_col') }}</th>
-                    <th>{{ __('admin.testimonial_rating_col') }}</th>
-                    <th>{{ __('admin.status') }}</th>
-                    <th>{{ __('admin.actions') }}</th>
+                    <th scope="col">{{ __('admin.booking_customer') }}</th>
+                    <th scope="col">{{ __('admin.testimonial_review_col') }}</th>
+                    <th scope="col">{{ __('admin.testimonial_rating_col') }}</th>
+                    <th scope="col">{{ __('admin.status') }}</th>
+                    <th scope="col">{{ __('admin.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,7 +29,7 @@
                         <div style="display:flex; align-items:center; gap:0.6rem;">
                             @php $av = $t->getFirstMedia('avatar'); @endphp
                             @if($av)
-                                <img src="{{ $av->getUrl() }}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid #E2E8F0; flex-shrink:0;">
+                                <img src="{{ $av->getUrl() }}" alt="{{ $t->name }}" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:2px solid #E2E8F0; flex-shrink:0;">
                             @else
                                 <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,#C5A028,#F0D060); display:flex; align-items:center; justify-content:center; font-weight:800; color:#1A1A1A; font-size:0.9rem; flex-shrink:0;">
                                     {{ mb_substr($t->name, 0, 1) }}

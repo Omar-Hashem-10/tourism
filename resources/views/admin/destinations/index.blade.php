@@ -18,11 +18,11 @@
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>{{ __('admin.destination_name_col') }}</th>
-                    <th>{{ __('admin.category') }}</th>
-                    <th>{{ __('admin.featured_label') }}</th>
-                    <th>{{ __('admin.order') }}</th>
-                    <th>{{ __('admin.actions') }}</th>
+                    <th scope="col">{{ __('admin.destination_name_col') }}</th>
+                    <th scope="col">{{ __('admin.category') }}</th>
+                    <th scope="col">{{ __('admin.featured_label') }}</th>
+                    <th scope="col">{{ __('admin.order') }}</th>
+                    <th scope="col">{{ __('admin.actions') }}</th>
                 </tr>
             </thead>
             <tbody>

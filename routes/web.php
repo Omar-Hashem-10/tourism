@@ -124,7 +124,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('settings',           [Admin\SettingController::class, 'update'])->name('settings.update');
 
         Route::post('lang/{locale}', [HomeController::class, 'setAdminLang'])
-            ->name('admin.lang.switch')
+            ->name('lang.switch')
             ->where('locale', 'ar|en');
     });
 });
